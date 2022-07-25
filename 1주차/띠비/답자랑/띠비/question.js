@@ -22,10 +22,10 @@ const changeItemsDisplay = (els, display) => {
 
 const sumAll = (arr) => arr.reduce((acc, item) => acc + item, 0);
 
-const getTextBySumComparison = (sum, target) =>
-    sum > target
-        ? `으로 $${target}를 넘습니다`
-        : `으로 $${target}를 넘지 못합니다`;
+const getTextByComparison = (target, criteria) =>
+    target > criteria
+        ? `으로 $${criteria}를 넘습니다`
+        : `으로 $${criteria}를 넘지 못합니다`;
 
 const getNumberArrayOfElements = (els, targetClass) =>
     els.reduce((acc, item) => {
@@ -52,7 +52,7 @@ const getTargetStoreItem = (filter) => {
 
 const setSumTailInnerText = (sum) => {
     const sumTailSpan = document.getElementById("sum-tail");
-    sumTailSpan.innerText = getTextBySumComparison(sum, 100);
+    sumTailSpan.innerText = getTextByComparison(sum, 100);
 };
 
 const setSumInnerText = (sum) => {
