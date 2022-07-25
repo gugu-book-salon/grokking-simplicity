@@ -102,11 +102,11 @@ function getPriceFromStoreItem(storeItems, filter) {
   );
 }
 
-function clickEventHandler(storeItems, sumSpan, sumTailSpan) {
+function clickEventHandler(storeItems, setAllTextByPrice) {
   return function (event) {
     const filter = event.target.dataset.filter;
     setDisplayByClassName(storeItems, filter);
-    setAllText(getPriceFromStoreItem(storeItems, filter), sumSpan, sumTailSpan);
+    setAllTextByPrice(getPriceFromStoreItem(storeItems, filter));
   }
 }
 
@@ -118,18 +118,20 @@ const setDisplayBlock = setStyle('display', 'block');
 const setDisplayNone = setStyle('display', 'none');
 
 function init(elements) {
-  setAllText(
-    getTotalStoreItemPrice(elements.totalItemPriceElement),
-    elements.sumSpan,
-    elements.sumTailSpan,
-  );
+  function setAllTextByPrice(price) {
+    return setAllText(
+      price,
+      elements.sumSpan,
+      elements.sumTailSpan,
+    );
+  }
+  setAllTextByPrice(getTotalStoreItemPrice(elements.totalItemPriceElement));
   elements.buttons.forEach(function (button) {
     button.addEventListener(
       'click',
       clickEventHandler(
         elements.storeItems,
-        elements.sumSpan,
-        elements.sumTailSpan,
+        setAllTextByPrice,
       ),
     );
   });
