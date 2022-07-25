@@ -30,18 +30,18 @@ function showItems(storeItems, filter) {
 
 // 필터링 된 아이템의 총 합계 구하기
 function getItemsTotal(storeItems) {
-  let total = 0;
-
-  storeItems.forEach((item) => {
+  const total = Array.from(storeItems).reduce((prev, curr, idx, src) => {
+    const item = src[idx];
     if (item.style.display === "block" || item.style.display === "") {
       const price = parseInt(
         item.querySelector(".store-item-price").innerText,
         10
       );
 
-      total = add(total, price);
+      return add(prev, price);
     }
-  });
+    return prev;
+  }, 0);
 
   return total;
 }
