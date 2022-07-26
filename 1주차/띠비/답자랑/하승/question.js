@@ -6,18 +6,10 @@
 
 const buttons = document.querySelectorAll(".filter-btn");
 const storeItems = document.querySelectorAll(".store-item");
-const sumSpan = document.getElementById("sum");
-const sumTailSpan = document.getElementById("sum-tail");
-// let sum = 0;
-// [...document.querySelectorAll(".store-item-price")].forEach(
-//   (item) => (sum += +item.innerText)
-// );
 
-const addPrice = (a, b) => {
-  a + b;
-};
+const addPrice = (a, b) => a + b;
 
-const changeFilter = (items, filter) => {
+const changeItemToFilter = (items, filter) => {
   //filter 버튼에 따라 다른 아이템 및 가격 보여주기
   items.forEach((item) => {
     const isFilteredStoreItem = item.classList.contains(filter);
@@ -28,10 +20,10 @@ const changeFilter = (items, filter) => {
 };
 
 const getTotalPriceItems = (items) => {
-  let sum = 0;
+  //총 가격 가져오기
   items.forEach((item) => {
     const totalPrice = Number(item.querySelector(".store-item-price"));
-    sum = addPrice(sum, totalPrice);
+    sum = addPrice(sum, totalPrice); //sum 변수 제거 후 addPrice 함수 이용
   });
   return totalPrice;
 };
@@ -51,7 +43,7 @@ const setTotalPriceItems = (items) => {
 buttons.forEach((button) => {
   button.addEventListener("click", function (e) {
     const filter = e.target.dataset.filter;
-    changeFilter(storeItems, filter);
+    changeItemToFilter(storeItems, filter);
     setTotalPriceItems(storeItems);
   });
 });
