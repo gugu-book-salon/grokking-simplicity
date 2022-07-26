@@ -13,18 +13,25 @@ const changeItemToFilter = (items, filter) => {
   //filter 버튼에 따라 다른 아이템 및 가격 보여주기
   items.forEach((item) => {
     const isFilteredStoreItem = item.classList.contains(filter);
-    isFilteredStoreItem
-      ? (item.style.display = "block")
-      : (item.style.display = "none");
+    item.style.display = isFilteredStoreItem ? "block" : "none";
   });
 };
 
 const getTotalPriceItems = (items) => {
   //총 가격 가져오기
-  items.forEach((item) => {
-    const totalPrice = Number(item.querySelector(".store-item-price"));
-    sum = addPrice(sum, totalPrice); //sum 변수 제거 후 addPrice 함수 이용
-  });
+  const totalPrice = Array.from(items).reduce(
+    (preValue, _, currentIndex, arr) => {
+      const currentItem = arr[currentIndex];
+      if (currentItem.style.display === "block") {
+        const currentPrice = Number(
+          currentItem.querySelector(".store-item-price").innerText
+        );
+        return addPrice(preValue, currentPrice);
+      }
+      return preValue;
+    },
+    0
+  );
   return totalPrice;
 };
 
@@ -35,9 +42,8 @@ const setTotalPriceItems = (items) => {
 
   const sumPrice = getTotalPriceItems(items);
   sumSpan.innerText = `$${sumPrice}`;
-  sumPrice > 100
-    ? (sumTailSpan.innerText = `으로 $100를 넘습니다`)
-    : (sumTailSpan.innerText = `으로 $100를 넘지 못합니다`);
+  sumTailSpan.innerText =
+    sumPrice > 100 ? `으로 $100를 넘습니다` : `으로 $100를 넘지 못합니다`;
 };
 
 buttons.forEach((button) => {
