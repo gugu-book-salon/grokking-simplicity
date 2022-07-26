@@ -13,43 +13,54 @@ function add(a, b) {
   return a + b;
 }
 
-function setSumTailSpanInnerText(sum) {
-  const sumTailSpan = document.getElementById("sum-tail");
-  sumTailSpan.innerText = compareNum(sum, 100)
-    ? `으로 $100를 넘습니다`
-    : `으로 $100를 넘지 못합니다`;
-}
-
 function setSumSpanInnerText(sum) {
   const sumSpan = document.getElementById("sum");
   sumSpan.innerText = `${sum}`;
 }
 
-function setInnerText(sum) {
-  setSumSpanInnerText(sum);
-  setSumTailSpanInnerText(sum);
+function setSumTailSpanInnerText(sum, target) {
+  const sumTailSpan = document.getElementById("sum-tail");
+  sumTailSpan.innerText = compareNum(sum, target)
+    ? `으로 $${target}를 넘습니다`
+    : `으로 $${target}를 넘지못합니다`;
 }
 
-function convertNum(data) {
-  return Number(data);
+function isAllFilter(filter) {
+  return filter === "all";
+}
+function containFilter(classList, filter) {
+  return classList.contains(filter);
+}
+
+function displayNone(storeItems, filter) {
+  storeItems.forEach((item) => {
+    if (!containFilter(item.classList, filter) && !isAllFilter(filter)) {
+      item.style.display = "none";
+      return;
+    }
+  });
+}
+
+function getFilteredItems(storeItems, _filter) {
+  return Object.values(storeItems).filter(
+    (item) => containFilter(item.classList, _filter) || isAllFilter(_filter)
+  );
 }
 
 function showItempSumPrice(filter) {
   let sum = 0;
   const storeItems = document.querySelectorAll(".store-item");
-  storeItems.forEach(function (item) {
-    if (item.classList.contains(filter) || filter === "all") {
-      sum = add(
-        sum,
-        convertNum(item.querySelector(".store-item-price").innerText)
-      );
-
-      item.style.display = "block";
-      setInnerText(sum);
-    } else {
-      item.style.display = "none";
-    }
-  });
+  displayNone(storeItems, filter);
+  const filteredItems = getFilteredItems(storeItems, filter);
+  sum = Object.values(filteredItems).reduce((acc, current) => {
+    current.style.display = "block";
+    return add(
+      acc,
+      Number(current.querySelector(".store-item-price").innerText)
+    );
+  }, 0);
+  setSumSpanInnerText(sum);
+  setSumTailSpanInnerText(sum, 100);
 }
 
 function main() {
