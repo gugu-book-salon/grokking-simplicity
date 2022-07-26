@@ -28,13 +28,14 @@ function setSumTailSpanInnerText(sum, target) {
 function isAllFilter(filter) {
   return filter === "all";
 }
-function containFilter(classList, filter) {
+
+function isTargetFilter(classList, filter) {
   return classList.contains(filter);
 }
 
-function displayNone(storeItems, filter) {
+function setDisplayNone(storeItems, filter) {
   storeItems.forEach((item) => {
-    if (!containFilter(item.classList, filter) && !isAllFilter(filter)) {
+    if (!isTargetFilter(item.classList, filter) && !isAllFilter(filter)) {
       item.style.display = "none";
       return;
     }
@@ -43,33 +44,40 @@ function displayNone(storeItems, filter) {
 
 function getFilteredItems(storeItems, _filter) {
   return Object.values(storeItems).filter(
-    (item) => containFilter(item.classList, _filter) || isAllFilter(_filter)
+    (item) => isTargetFilter(item.classList, _filter) || isAllFilter(_filter)
   );
 }
 
-function showItempSumPrice(filter) {
-  let sum = 0;
-  const storeItems = document.querySelectorAll(".store-item");
-  displayNone(storeItems, filter);
-  const filteredItems = getFilteredItems(storeItems, filter);
-  sum = Object.values(filteredItems).reduce((acc, current) => {
+function getStoreItems(className) {
+  return document.querySelectorAll(className);
+}
+
+function getTotalPrice(filteredItems) {
+  return Object.values(filteredItems).reduce((acc, current) => {
     current.style.display = "block";
     return add(
       acc,
       Number(current.querySelector(".store-item-price").innerText)
     );
   }, 0);
+}
+
+function showItemSumPrice(filter) {
+  const storeItems = getStoreItems(".store-item");
+  setDisplayNone(storeItems, filter);
+  const filteredItems = getFilteredItems(storeItems, filter);
+  const sum = getTotalPrice(filteredItems);
   setSumSpanInnerText(sum);
   setSumTailSpanInnerText(sum, 100);
 }
 
 function main() {
-  showItempSumPrice("all");
+  showItemSumPrice("all");
   const buttons = document.querySelectorAll(".filter-btn");
   buttons.forEach(function (button) {
     button.addEventListener("click", function (e) {
       const filter = e.target.dataset.filter;
-      showItempSumPrice(filter);
+      showItemSumPrice(filter);
     });
   });
 }
