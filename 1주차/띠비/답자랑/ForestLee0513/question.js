@@ -4,10 +4,6 @@
 // 반복되는 코드는 삼가주세요
 // 문제 링크 : https://codesandbox.io/s/hamsuhyeongkoding-1juca-ddibi-7widdo?file=/src/index.js:0-3354
 // 계산 함수 //
-// 비교
-function compare(a, b) {
-  return a > b;
-}
 
 // 더하기
 function add(a, b) {
@@ -32,7 +28,7 @@ function showItems(storeItems, filter) {
 function getItemsTotal(storeItems) {
   const total = Array.from(storeItems).reduce((prev, curr, idx, src) => {
     const item = src[idx];
-    if (item.style.display === "block" || item.style.display === "") {
+    if (item.style.display !== "none") {
       const price = parseInt(
         item.querySelector(".store-item-price").innerText,
         10
@@ -52,7 +48,7 @@ function setCalculatedAmount(storeItems) {
 
   const total = getItemsTotal(storeItems);
   sumSpan.innerText = `$${total}`;
-  if (compare(total, 100)) {
+  if (total > 100) {
     sumTailSpan.innerText = "으로 $100를 넘습니다.";
   } else {
     sumTailSpan.innerText = "으로 $100를 넘지 못합니다.";
