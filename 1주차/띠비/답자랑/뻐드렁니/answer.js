@@ -4,22 +4,28 @@
 // 반복되는 코드는 삼가주세요
 // 문제 링크 : https://codesandbox.io/s/hamsuhyeongkoding-1juca-ddibi-7widdo?file=/src/index.js:0-3354
 
-cmain();
+main();
 
-function setStyleNone(item) {
-  return (item.style.display = "none");
+function isSelected(item, selectedItem) {
+  return item.classList.contains(selectedItem) || selectedItem === "all";
 }
 
-function setStlyeBlock(item) {
-  return (item.style.display = "block");
+function getTotalPrice(storeItems) {
+  //reduce 함수 구현
 }
 
-function sumPrice(a, b) {
+function setTotalPrice(storeItems){
+  const sum = getTotalPrice(storeItems);
+  setSumSpan(sum);
+  setSumTailSpan(sum);
+}
+
+function setStyle(item, style) {
+  return (item.style.display = style);
+}
+
+function addTwo(a, b) {
   return a + b;
-}
-
-function compareTwo(a, b) {
-  return a > b;
 }
 
 function setSumSpan(sum) {
@@ -29,35 +35,31 @@ function setSumSpan(sum) {
 
 function setSumTailSpan(sum) {
   const sumTailSpan = document.getElementById("sum-tail");
-  if (compareTwo(sum, 100)) {
+  if (sum > 100) {
     sumTailSpan.innerText = `으로 $100를 넘습니다`;
   } else {
     sumTailSpan.innerText = `으로 $100를 넘지 못합니다`;
   }
 }
 
-function filterItem(selectedItem) {
-  let sum = 0;
-  const storeItems = document.querySelectorAll(".store-item");
+function renderSelectedItem(storeItems,selectedItem) {
   storeItems.forEach(function (item) {
-    if (item.classList.contains(selectedItem) || selectedItem === "all") {
-      const price = +item.querySelector(".store-item-price").innerText;
-      sum = sumPrice(sum, price);
-      setStlyeBlock(item);
-      setSumSpan(sum);
-      setSumTailSpan(sum);
+    if (isSelected(item, selectedItem)) {
+      setStyle(item, "block");
     } else {
-      setStyleNone(item);
+      setStyle(item, "none");
     }
   });
 }
 
 function main() {
+  const storeItems = document.querySelectorAll(".store-item");
   const buttons = document.querySelectorAll(".filter-btn");
   buttons.forEach(function (button) {
     button.addEventListener("click", function (e) {
       const filter = e.target.dataset.filter;
-      filterItem(filter);
+      renderSelectedItem(storeItems,filter);
+      setTotalPrice(storeItems);
     });
   });
 }
