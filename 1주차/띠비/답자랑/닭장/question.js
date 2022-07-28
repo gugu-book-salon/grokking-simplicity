@@ -3,6 +3,8 @@
 // 암묵적 할당을 하지마세요
 // 반복되는 코드는 삼가주세요
 // 문제 링크 : https://codesandbox.io/s/hamsuhyeongkoding-1juca-ddibi-7widdo?file=/src/index.js:0-3354
+// 가짜로 컨플릭트 만들기
+// 가짜로 컨플릭트 만들기
 
 const buttons = document.querySelectorAll(".filter-btn");
 const storeItems = document.querySelectorAll(".store-item");
@@ -19,7 +21,9 @@ if (sum > 100) {
 } else {
   sumTailSpan.innerText = `으로 $100를 넘지 못합니다`;
 }
-
+// 가짜로 컨플릭트 만들기
+// 가짜로 컨플릭트 만들기
+// 가짜로 컨플릭트 만들기
 buttons.forEach(function (button) {
   button.addEventListener("click", function (e) {
     sum = 0;
@@ -100,6 +104,8 @@ buttons.forEach(function (button) {
           }
         } else {
           item.style.display = "none";
+
+          // 가짜로 컨플릭트 만들기
         }
       });
     }
