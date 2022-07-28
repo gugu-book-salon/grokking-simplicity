@@ -4,9 +4,6 @@
 // 반복되는 코드는 삼가주세요
 // 문제 링크 : https://codesandbox.io/s/hamsuhyeongkoding-1juca-ddibi-7widdo?file=/src/index.js:0-3354
 
-const buttons = document.querySelectorAll(".filter-btn");
-const storeItems = document.querySelectorAll(".store-item");
-
 const addPrice = (a, b) => a + b;
 
 const changeItemToFilter = (items, filter) => {
@@ -46,10 +43,17 @@ const setTotalPriceItems = (items) => {
     sumPrice > 100 ? `으로 $100를 넘습니다` : `으로 $100를 넘지 못합니다`;
 };
 
-buttons.forEach((button) => {
-  button.addEventListener("click", function (e) {
-    const filter = e.target.dataset.filter;
-    changeItemToFilter(storeItems, filter);
-    setTotalPriceItems(storeItems);
+const filterButton = () => {
+  const buttonsByFilter = document.querySelectorAll(".filter-btn");
+  const storeItems = document.querySelectorAll(".store-item");
+
+  buttonsByFilter.forEach((button) => {
+    button.addEventListener("click", function (clickedEvent) {
+      const filter = clickedEvent.target.dataset.filter;
+      changeItemToFilter(storeItems, filter);
+      setTotalPriceItems(storeItems);
+    });
   });
-});
+};
+
+filterButton();
