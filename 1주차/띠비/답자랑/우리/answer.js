@@ -73,11 +73,10 @@ function showItemSumPrice(filter) {
 
 function main() {
   showItemSumPrice("all");
-  const buttons = document.querySelectorAll(".filter-btn");
-  buttons.forEach(function (button) {
-    button.addEventListener("click", function (e) {
-      const filter = e.target.dataset.filter;
-      showItemSumPrice(filter);
-    });
+  document.addEventListener("click", function (event) {
+    const btn = event.target.closest(".filter-btn");
+    if (!btn) return;
+    const filter = event.target.dataset.filter;
+    showItemSumPrice(filter);
   });
 }
