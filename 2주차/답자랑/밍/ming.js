@@ -42,9 +42,13 @@ const magicianCookies = [
   "마법사맛 쿠키",
 ];
 
+function getListItemFromText(text) {
+  return `<li>${text}</li>`;
+}
+
 function getCookieListItems(cookies) {
   return cookies.reduce(
-    (content, cookie) => content + `<li>${cookie}</li>`,
+    (content, cookie) => content + getListItemFromText(cookie),
     "",
   );
 }
@@ -57,7 +61,7 @@ function setAppContentByCookies(cookies) {
 
 function getAllCookies(...cookieArrays) {
   return cookieArrays.reduce(
-    (allCookies, cookieArray) => allCookies.concat(cookieArray),
+    (allCookies, cookieArray) => [...allCookies, ...cookieArray],
     [],
   );
 }
@@ -66,10 +70,14 @@ function applyButtonClickEventHandler({ button, getCookies }) {
   button.addEventListener("click", () => setAppContentByCookies(getCookies()));
 }
 
+function getTextContentFromElement(element) {
+  return element.textContent;
+}
+
 function getCurrentCookies() {
   const content = document.getElementById("content");
   const contentChildren = [...content.children];
-  return contentChildren.map((element) => element.textContent);
+  return contentChildren.map(getTextContentFromElement);
 }
 
 const getFilterInputValue = () => {
