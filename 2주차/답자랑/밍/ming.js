@@ -62,7 +62,7 @@ function getAllCookies(...cookieArrays) {
   );
 }
 
-function applyButtonClickEventHandler(button, getCookies) {
+function applyButtonClickEventHandler({ button, getCookies }) {
   button.addEventListener("click", () => setAppContentByCookies(getCookies()));
 }
 
@@ -84,19 +84,28 @@ function getFilterdCookies() {
 }
 
 function init() {
-  const allButton = document.getElementById("all");
-  const assultButton = document.getElementById("assult");
-  const defensiveButton = document.getElementById("defensive");
-  const magicianButton = document.getElementById("magician");
-  const filterButton = document.getElementById("filter-button");
-
-  applyButtonClickEventHandler(allButton, () =>
-    getAllCookies(assultCookies, defensiveCookies, magicianCookies),
-  );
-  applyButtonClickEventHandler(assultButton, () => assultCookies);
-  applyButtonClickEventHandler(defensiveButton, () => defensiveCookies);
-  applyButtonClickEventHandler(magicianButton, () => magicianCookies);
-  applyButtonClickEventHandler(filterButton, getFilterdCookies);
+  [
+    {
+      button: document.getElementById("all"),
+      getCookies: () => getAllCookies(assultCookies, defensiveCookies, magicianCookies)
+    },
+    {
+      button: document.getElementById("assult"),
+      getCookies: () => assultCookies,
+    },
+    {
+      button: document.getElementById("defensive"),
+      getCookies: () => defensiveCookies,
+    },
+    {
+      button: document.getElementById("magician"),
+      getCookies: () => magicianCookies
+    },
+    {
+      button: document.getElementById("filter-button"),
+      getCookies: getFilterdCookies,
+    },
+  ].forEach(applyButtonClickEventHandler);
 }
 
 init();
