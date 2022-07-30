@@ -11,7 +11,7 @@ function getElements(selector) {
 function getElement(element) {
   return function (selector) {
     return element.querySelector(selector);
-  }
+  };
 }
 
 const getElementFromDocument = getElement(document);
@@ -31,19 +31,19 @@ function getTotalStoreItemPrice(elements) {
 function checkPrice(limit) {
   return function (price) {
     return price > limit;
-  }
+  };
 }
 
 function setInnerText(text) {
   return function (element) {
     element.innerText = text;
-  }
+  };
 }
 
 function setStyle(key, val) {
   return function (element) {
     element.style[key] = val;
-  }
+  };
 }
 
 function checkClassList(element, findClass) {
@@ -59,25 +59,26 @@ function setInnerTextByTotalPrice(element) {
     }
 
     return totalPrice;
-  }
+  };
 }
 
 function setPriceInnerText(sumSpan) {
   return function (price) {
     setInnerText(`$${price}`)(sumSpan);
     return price;
-  }
+  };
 }
+
 function setAllText(price, sumSpan, sumTailSpan) {
-  setPriceInnerText(sumSpan)(
-    setInnerTextByTotalPrice(sumTailSpan)(
-      price,
-    ),
-  )
+  // FIXME
+  // pipe를 쓰면 로직 명확하지만 변수에 대입을해 사용 할 경우
+  // 뭔가 함수 이름이 애매해짐
+  // setInnerTextByTotalPrice 함수는 계산된 totalPrice를 그대로 반환하고 있음
+  setPriceInnerText(sumSpan)(setInnerTextByTotalPrice(sumTailSpan)(price));
 }
 
 function isAllFilter(filter) {
-  return filter === 'all';
+  return filter === "all";
 }
 
 function isClassNameInclude(element, className) {
@@ -91,58 +92,50 @@ function setDisplayByClassName(storeItems, filter) {
       return;
     }
     setDisplayNone(storeItem);
-  })
+  });
 }
 
 function getPriceFromStoreItem(storeItems, filter) {
   return getTotalStoreItemPrice(
     storeItems
-      .filter((storeItem) => isAllFilter(filter) || isClassNameInclude(storeItem, filter))
-      .map((storeItem) => getElement(storeItem)('.store-item-price'))
+      .filter(
+        (storeItem) =>
+          isAllFilter(filter) || isClassNameInclude(storeItem, filter)
+      )
+      .map((storeItem) => getElement(storeItem)(".store-item-price"))
   );
 }
 
-function clickEventHandler(storeItems, setAllTextByPrice) {
-  return function (event) {
-    const filter = event.target.dataset.filter;
-    setDisplayByClassName(storeItems, filter);
-    setAllTextByPrice(getPriceFromStoreItem(storeItems, filter));
-  }
+function clickEventHandler(event, storeItems, setAllTextByPrice) {
+  const filter = event.target.dataset.filter;
+  setDisplayByClassName(storeItems, filter);
+  setAllTextByPrice(getPriceFromStoreItem(storeItems, filter));
 }
 
 const check100Price = checkPrice(100);
-const set100OverText = setInnerText('으로 $100를 넘습니다');
-const set100UnderText = setInnerText('으로 $100를 넘지 못합니다');
+const set100OverText = setInnerText("으로 $100를 넘습니다");
+const set100UnderText = setInnerText("으로 $100를 넘지 못합니다");
 
-const setDisplayBlock = setStyle('display', 'block');
-const setDisplayNone = setStyle('display', 'none');
+const setDisplayBlock = setStyle("display", "block");
+const setDisplayNone = setStyle("display", "none");
 
 function init(elements) {
   function setAllTextByPrice(price) {
-    return setAllText(
-      price,
-      elements.sumSpan,
-      elements.sumTailSpan,
-    );
+    return setAllText(price, elements.sumSpan, elements.sumTailSpan);
   }
-  setAllTextByPrice(getTotalStoreItemPrice(elements.totalItemPriceElement));
-  elements.buttons.forEach(function (button) {
-    button.addEventListener(
-      'click',
-      clickEventHandler(
-        elements.storeItems,
-        setAllTextByPrice,
-      ),
-    );
+  const totalPrice = getTotalStoreItemPrice(elements.totalItemPriceElement);
+  setAllTextByPrice(totalPrice);
+  elements.buttonContainer.addEventListener("click", (event) => {
+    if (event.target.closest(".filter-btn")) {
+      clickEventHandler(event, elements.storeItems, setAllTextByPrice);
+    }
   });
 }
 
-init(
-  {
-    sumSpan: getElementFromDocument("#sum"),
-    sumTailSpan: getElementFromDocument("#sum-tail"),
-    totalItemPriceElement: getElements(".store-item-price"),
-    buttons: getElements(".filter-btn"),
-    storeItems: getElements(".store-item"),
-  }
-);
+init({
+  sumSpan: getElementFromDocument("#sum"),
+  sumTailSpan: getElementFromDocument("#sum-tail"),
+  totalItemPriceElement: getElements(".store-item-price"),
+  buttonContainer: getElementFromDocument(".filter-btn").parentElement,
+  storeItems: getElements(".store-item")
+});
