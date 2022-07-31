@@ -13,6 +13,9 @@
 // 장바구니에는 상품명과 개수가 저장 되었지만 TODO LIST 에는 할일 이름과 마감 시간, 중요도 데이터가 들어가 있습니다
 // 장바구니에서 계층화 시킨 함수들을 이용해서 코드 수정을 최소화 하여 TODO LIST를 구현해주세요
 
+// ************************** //
+// ********* INPUT ********* //
+// ************************ //
 function getInputValue() {
   const input = document.querySelector('.addItems-input');
   return input.value;
@@ -23,6 +26,9 @@ function resetInputValue() {
   input.value = '';
 }
 
+// ****************************************** //
+// ********* DOM HANDLER AND UTILS ********* //
+// **************************************** //
 function setInnerText(element, text) {
   element.innerText = text;
   return element;
@@ -51,24 +57,54 @@ function isClassContains(element, findClass) {
   return element.classList.contains(findClass);
 }
 
-function manageLocalStorage(key) {
-  return {
-    set: (value) => {
-      localStorage.setItem(key, value);
-    },
-    get: (defaultValue) => {
-      const value = localStorage.getItem(key);
-      return value ? value : defaultValue;
-    },
-    clear: () => {
-      localStorage.removeItem(key);
-    },
-  };
-}
-
 const manageSuccessClass = manageClass('success');
 const manageAlertClass = manageClass('alert');
 
+function setItemCount(count) {
+  setInnerText(
+    document.querySelector('.displayItems-count'),
+    `(${count})`
+  );
+}
+
+
+function addItemElement(list, value) {
+  value !== '' && list.appendChild(createItemElement(value));
+}
+
+function createItemElement(value) {
+  const element = addClass(document.createElement('div'), 'grocery-item');
+  element.innerHTML = `
+    <h4 class='grocery-item__title'>${value}</h4>
+    <a href='#' class='grocery-item__link'>
+      <i class='far fa-trash-alt'></i>
+    </a>
+  `;
+  return element;
+}
+
+function removeItems(listElement) {
+  const groceryListLoacalStorageManager = manageLocalStorage('groceryList');
+  const groceryListItemElements = document.querySelectorAll('.grocery-item');
+
+  setRemoveShowAction(groceryListItemElements.length);
+  groceryListLoacalStorageManager.clear();
+  groceryListItemElements.forEach((groceryListItemElement) => listElement.removeChild(groceryListItemElement));
+
+  return 0;
+}
+
+function findListItemElement(element) {
+  let findElement = element;
+  while (!isClassContains(findElement, 'grocery-item')) {
+    findElement = element.parentElement;
+  }
+  return findElement;
+}
+
+// ********************************** //
+// ********* EVENT HANDLER ********* //
+// ******************************** //
 function submitButtonClickHandler(listElement) {
   return function (event) {
     event.preventDefault();
@@ -113,7 +149,9 @@ function listItemClickHandler(listElement) {
   }
 }
 
-
+// ********************************* //
+// ********* ACTION LOGIC ********* //
+// ******************************* //
 function showAction(element, text, isSuccess) {
   const { addClassName, removeClassName } = (isSuccess ? manageSuccessClass : manageAlertClass)(
     element
@@ -144,13 +182,6 @@ function setCreateShowAction(value) {
   showAction(...[addItemsActionElement, ...params]);
 }
 
-function setItemCount(count) {
-  setInnerText(
-    document.querySelector('.displayItems-count'),
-    `(${count})`
-  );
-}
-
 function setRemoveShowAction(value, isSingle) {
   const displayItemsActionElement = document.querySelector('.displayItems-action');
 
@@ -165,19 +196,22 @@ function setRemoveShowAction(value, isSingle) {
   showAction(...[displayItemsActionElement, ...params]);
 }
 
-function addItemElement(list, value) {
-  value !== '' && list.appendChild(createItemElement(value));
-}
-
-function createItemElement(value) {
-  const element = addClass(document.createElement('div'), 'grocery-item');
-  element.innerHTML = `
-    <h4 class='grocery-item__title'>${value}</h4>
-    <a href='#' class='grocery-item__link'>
-      <i class='far fa-trash-alt'></i>
-    </a>
-  `;
-  return element;
+// ********************************** //
+// ********* LOCAL STORAGE ********* //
+// ******************************** //
+function manageLocalStorage(key) {
+  return {
+    set: (value) => {
+      localStorage.setItem(key, value);
+    },
+    get: (defaultValue) => {
+      const value = localStorage.getItem(key);
+      return value ? value : defaultValue;
+    },
+    clear: () => {
+      localStorage.removeItem(key);
+    },
+  };
 }
 
 function updateStorage(value) {
@@ -195,25 +229,9 @@ function displayStorage(listElement) {
   return storageItems;
 }
 
-function removeItems(listElement) {
-  const groceryListLoacalStorageManager = manageLocalStorage('groceryList');
-  const groceryListItemElements = document.querySelectorAll('.grocery-item');
-
-  setRemoveShowAction(groceryListItemElements.length);
-  groceryListLoacalStorageManager.clear();
-  groceryListItemElements.forEach((groceryListItemElement) => listElement.removeChild(groceryListItemElement));
-
-  return 0;
-}
-
-function findListItemElement(element) {
-  let findElement = element;
-  while (!isClassContains(findElement, 'grocery-item')) {
-    findElement = element.parentElement;
-  }
-  return findElement;
-}
-
+// ************************** //
+// ********** MAIN ********* //
+// ************************ //
 function init() {
   const submit = document.querySelector('.addItems-submit');
   const list = document.querySelector('.list');
