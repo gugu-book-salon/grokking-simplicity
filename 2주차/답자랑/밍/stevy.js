@@ -23,12 +23,6 @@ function resetInputValue() {
   input.value = '';
 }
 
-function removeElement(parent) {
-  return function (children) {
-    parent.removeChild(children);
-  }
-}
-
 function setInnerText(element, text) {
   element.innerText = text;
   return element;
@@ -83,23 +77,46 @@ function submitButtonClickHandler(listElement) {
   return function (event) {
     event.preventDefault();
     const inputValue = getInputValue();
+
     addItemElement(listElement, inputValue);
     setCreateShowAction(inputValue);
-    updateStorage(inputValue);
+
+    const itemList = updateStorage(inputValue);
+    setItemCount(itemList.length);
   };
 }
 
 function loadEventHandler(listElement) {
   return function() {
-    displayStorage(listElement);
+    const itemList = displayStorage(listElement);
+    setItemCount(itemList.length);
   };
 }
 
 function clearButtonClickHandler(listElement) {
   return function () {
-    removeItems(listElement);
+    const itemListCount = removeItems(listElement);
+    setItemCount(itemListCount);
   };
 }
+
+function listItemClickHandler(listElement) {
+  return function (event) {
+    event.preventDefault();
+    const element = findListItemElement(event.target);
+    const groceryListLoacalStorageManager = manageLocalStorage('groceryList');
+    const currentLocalStorageItems = JSON.parse(groceryListLoacalStorageManager.get('[]'));
+    const text = element.textContent.trim();
+    const newItems = currentLocalStorageItems.filter((item) => item !== text);
+
+    listElement.removeChild(element);
+    setRemoveShowAction(text, true);
+    setItemCount(newItems.length);
+
+    groceryListLoacalStorageManager.set(JSON.stringify(newItems));
+  }
+}
+
 
 function showAction(element, text, isSuccess) {
   const { add, remove } = (isSuccess ? manageSuccessClass : manageAlertClass)(
@@ -131,6 +148,13 @@ function setCreateShowAction(value) {
   showAction(...[addItemsActionElement, ...params]);
 }
 
+function setItemCount(count) {
+  setInnerText(
+    document.querySelector('.displayItems-count'),
+    `(${count})`
+  );
+}
+
 function setRemoveShowAction(value, isSingle) {
   const displayItemsActionElement = document.querySelector('.displayItems-action');
 
@@ -146,7 +170,7 @@ function setRemoveShowAction(value, isSingle) {
 }
 
 function addItemElement(list, value) {
-  appendElement(list, createItemElement(value));
+  value !== '' && appendElement(list, createItemElement(value));
 }
 
 function createItemElement(value) {
@@ -165,22 +189,25 @@ function updateStorage(value) {
   let groceryList = JSON.parse(groceryListLoacalStorageManager.get('[]'));
   groceryList.push(value);
   groceryListLoacalStorageManager.set(JSON.stringify(groceryList));
+  return groceryList;
 }
 
 function displayStorage(listElement) {
   const storageItems = JSON.parse(manageLocalStorage('groceryList').get('[]'));
   storageItems
     .forEach((storageItem) => addItemElement(listElement, storageItem));
+  return storageItems;
 }
 
 function removeItems(listElement) {
   const groceryListLoacalStorageManager = manageLocalStorage('groceryList');
   const items = document.querySelectorAll('.grocery-item');
-  const removeElementFromList = removeElement(listElement);
 
-  groceryListLoacalStorageManager.clear();
-  items.forEach(removeElementFromList);
   setRemoveShowAction(items.length);
+  groceryListLoacalStorageManager.clear();
+  items.forEach((item) => listElement.removeChild(item));
+
+  return 0;
 }
 
 function findListItemElement(element) {
@@ -189,22 +216,6 @@ function findListItemElement(element) {
     findElement = element.parentElement;
   }
   return findElement;
-}
-
-function listItemClickHandler(list) {
-  return function (event) {
-    event.preventDefault();
-    const element = findListItemElement(event.target);
-    const groceryListLoacalStorageManager = manageLocalStorage('groceryList');
-    const currentLocalStorageItems = JSON.parse(groceryListLoacalStorageManager.get('[]'));
-    const text = element.textContent.trim();
-
-    removeElement(list)(element);
-    setRemoveShowAction(text, true);
-    groceryListLoacalStorageManager.set(
-      JSON.stringify(currentLocalStorageItems.filter((item) => item !== text)),
-    );
-  }
 }
 
 function init() {

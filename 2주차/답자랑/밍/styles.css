@@ -133,6 +133,11 @@ body {
   outline: none;
   background: transparent;
 }
+
+.displayItems-count {
+  margin-left: 4px;
+}
+
 /*Add utility action classes */
 .alert {
   color: red;
