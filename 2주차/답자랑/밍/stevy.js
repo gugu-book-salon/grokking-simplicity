@@ -41,18 +41,14 @@ function removeClass(element, className) {
 function manageClass(className) {
   return function (element) {
     return {
-      add: () => addClass(element, className),
-      remove: () => removeClass(element, className)
+      addClassName: () => addClass(element, className),
+      removeClassName: () => removeClass(element, className)
     };
   };
 }
 
 function isClassContains(element, findClass) {
   return element.classList.contains(findClass);
-}
-
-function appendElement(parent, children) {
-  parent.appendChild(children);
 }
 
 function manageLocalStorage(key) {
@@ -119,19 +115,19 @@ function listItemClickHandler(listElement) {
 
 
 function showAction(element, text, isSuccess) {
-  const { add, remove } = (isSuccess ? manageSuccessClass : manageAlertClass)(
+  const { addClassName, removeClassName } = (isSuccess ? manageSuccessClass : manageAlertClass)(
     element
   );
 
-  add();
-  setTimeout(remove, 3000);
+  addClassName();
+  setTimeout(removeClassName, 3000);
   setInnerText(element, text);
   resetInputValue();
 }
 
 /**
  * @param {(value: any) => boolean} predicate
- * @param {{ onSucess: string, onFail: string }} messages 성공 실패 메세지
+ * @param {{ onSuccess: string, onFail: string }} messages 성공 실패 메세지
  * @returns [string, boolean] -> [show action 텍스트, 성공 실패 여부]
  */
 function getShowActionParameters(predicate, messages) {
@@ -170,11 +166,11 @@ function setRemoveShowAction(value, isSingle) {
 }
 
 function addItemElement(list, value) {
-  value !== '' && appendElement(list, createItemElement(value));
+  value !== '' && list.appendChild(createItemElement(value));
 }
 
 function createItemElement(value) {
-  let element = addClass(document.createElement('div'), 'grocery-item');
+  const element = addClass(document.createElement('div'), 'grocery-item');
   element.innerHTML = `
     <h4 class='grocery-item__title'>${value}</h4>
     <a href='#' class='grocery-item__link'>
@@ -186,7 +182,7 @@ function createItemElement(value) {
 
 function updateStorage(value) {
   const groceryListLoacalStorageManager = manageLocalStorage('groceryList');
-  let groceryList = JSON.parse(groceryListLoacalStorageManager.get('[]'));
+  const groceryList = JSON.parse(groceryListLoacalStorageManager.get('[]'));
   groceryList.push(value);
   groceryListLoacalStorageManager.set(JSON.stringify(groceryList));
   return groceryList;
@@ -201,11 +197,11 @@ function displayStorage(listElement) {
 
 function removeItems(listElement) {
   const groceryListLoacalStorageManager = manageLocalStorage('groceryList');
-  const items = document.querySelectorAll('.grocery-item');
+  const groceryListItemElements = document.querySelectorAll('.grocery-item');
 
-  setRemoveShowAction(items.length);
+  setRemoveShowAction(groceryListItemElements.length);
   groceryListLoacalStorageManager.clear();
-  items.forEach((item) => listElement.removeChild(item));
+  groceryListItemElements.forEach((groceryListItemElement) => listElement.removeChild(groceryListItemElement));
 
   return 0;
 }
