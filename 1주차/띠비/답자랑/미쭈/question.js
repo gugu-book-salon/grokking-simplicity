@@ -2,52 +2,70 @@
 // 전역변수를 쓰지마세요
 // 암묵적 할당을 하지마세요
 // 반복되는 코드는 삼가주세요
-const buttons = document.querySelectorAll('.filter-btn');
-const storeItems = document.querySelectorAll('.store-item');
+// https://codesandbox.io/s/hamsuhyeongkoding-1juca-ddibi-forked-kb210j?file=/src/index.js:0-1848
 
-function resultOfSum(price, sumTailSpan) {
-  sumTailSpan.innerText =
-    price > 100 ? `으로 $100를 넘습니다` : `으로 $100를 넘지 못합니다`;
+main();
+
+function matchFilter(filter, value) {
+  return filter === value;
 }
 
-function sumOfPricess(sumOfPrice, filter) {
-  const sumSpan = document.getElementById('sum');
-  const sumTailSpan = document.getElementById('sum-tail');
-  sumSpan.innerText = `$${sumOfPrice}`;
-  resultOfSum(sumOfPrice, sumTailSpan);
-  if (filter === undefined) {
-    sumSpan.innerText = `$${140}`;
-    resultOfSum(140, sumTailSpan);
-  }
-}
-
-function showElements(item, filter, menu) {
-  if (filter === 'all') {
-    item.style.display = 'block';
+function compareValues(sum, value) {
+  if (sum > value) {
+    return `으로 $${value}를 넘습니다`;
   } else {
-    item.style.display = filter === menu ? 'block' : 'none';
+    return `으로 $${value}를 넘지 못합니다`;
   }
 }
 
-function categorizedByMenu(filter) {
+function itemListPriceTotal(filter) {
   const sumOfPrice = [
     ...document.querySelectorAll(`.store-item-price.${filter}`),
   ]
     .map((el) => +el.innerText)
-    .reduce((pre, cur) => pre + cur);
+    .reduce((pre, cur) => pre + cur, 0);
+  return sumOfPrice;
+}
+
+function updateInnerText(element, content) {
+  return (element.innerText = content);
+}
+
+function sumPrices(filter) {
+  const sumSpan = document.getElementById('sum');
+  const sumTailSpan = document.getElementById('sum-tail');
+  const totalPrice = itemListPriceTotal('all');
+  const totalPriceByMenu = itemListPriceTotal(filter);
+  if (filter === undefined) {
+    updateInnerText(sumSpan, `$${totalPrice}`);
+    updateInnerText(sumTailSpan, compareValues(totalPrice, 100));
+  } else {
+    updateInnerText(sumSpan, `$${totalPriceByMenu}`);
+    updateInnerText(sumTailSpan, compareValues(totalPriceByMenu, 100));
+  }
+}
+
+function showElements(item, filter, menu) {
+  if (matchFilter(filter, 'all') || matchFilter(filter, menu)) {
+    item.style.display = 'block';
+  } else {
+    item.style.display = 'none';
+  }
+}
+
+function renderByMenu(filter) {
+  const storeItems = document.querySelectorAll('.store-item');
   storeItems.forEach((item) => {
     showElements(item, filter, item.dataset.item);
-    sumOfPricess(sumOfPrice, filter);
+    sumPrices(filter);
   });
 }
 
-buttons.forEach((button) => {
-  button.addEventListener('click', (e) => {
+function main() {
+  window.addEventListener('DOMContentLoaded', sumPrices());
+  const btnGroup = document.querySelector('.btn-group');
+  btnGroup.addEventListener('click', (e) => {
     const filter = e.target.dataset.filter;
-    categorizedByMenu(filter);
+    renderByMenu(filter);
   });
-});
-
-sumOfPricess();
-
-// https://codesandbox.io/s/hamsuhyeongkoding-1juca-ddibi-forked-kb210j?file=/src/index.js:0-1335
+}
