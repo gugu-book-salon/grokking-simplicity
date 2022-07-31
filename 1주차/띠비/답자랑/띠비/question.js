@@ -1,107 +1,95 @@
-// 구현 조건
-// 전역변수를 쓰지마세요
-// 암묵적 할당을 하지마세요
-// 반복되는 코드는 삼가주세요
-// 문제 링크 : https://codesandbox.io/s/hamsuhyeongkoding-1juca-ddibi-7widdo?file=/src/index.js:0-3354
+/*
+ *  유틸성 함수들
+ * */
 
-const buttons = document.querySelectorAll(".filter-btn");
-const storeItems = document.querySelectorAll(".store-item");
-const sumSpan = document.getElementById("sum");
-const sumTailSpan = document.getElementById("sum-tail");
+const divideElementByClassContains = (els, targetClass) =>
+    els.reduce(
+        (acc, el) =>
+            el.classList.contains(targetClass)
+                ? [[...acc[0], el], acc[1]]
+                : [acc[0], [...acc[1], el]],
 
-let sum = 0;
-[...document.querySelectorAll(".store-item-price")].forEach(
-    (item) => (sum += +item.innerText)
-);
-sumSpan.innerText = `$${sum}`;
-if (sum > 100) {
-    sumTailSpan.innerText = `으로 $100를 넘습니다`;
-} else {
-    sumTailSpan.innerText = `으로 $100를 넘지 못합니다`;
-}
+        [[], []]
+    );
 
-buttons.forEach(function (button) {
-    button.addEventListener("click", function (e) {
-        sum = 0;
-        const filter = e.target.dataset.filter;
+const delegate = (e, targetQuery, cb) => e.target.closest(targetQuery) && cb(e);
 
-        if (filter === "all") {
-            //show all items
-            storeItems.forEach(function (item) {
-                const price = +item.querySelector(".store-item-price").innerText;
-                sum += price;
-                item.style.display = "block";
-            });
-            sumSpan.innerText = `$${sum}`;
-            if (sum > 100) {
-                sumTailSpan.innerText = `으로 $100를 넘습니다`;
-            } else {
-                sumTailSpan.innerText = `으로 $100를 넘지 못합니다`;
-            }
-        } else if (filter === "cakes") {
-            storeItems.forEach(function (item) {
-                if (item.classList.contains("cakes")) {
-                    const price = +item.querySelector(".store-item-price").innerText;
-                    sum += price;
-                    item.style.display = "block";
-                    sumSpan.innerText = `$${sum}`;
-                    if (sum > 100) {
-                        sumTailSpan.innerText = `으로 $100를 넘습니다`;
-                    } else {
-                        sumTailSpan.innerText = `으로 $100를 넘지 못합니다`;
-                    }
-                } else {
-                    item.style.display = "none";
-                }
-            });
-        } else if (filter === "cupcakes") {
-            storeItems.forEach(function (item) {
-                if (item.classList.contains("cupcakes")) {
-                    const price = +item.querySelector(".store-item-price").innerText;
-                    sum += price;
-                    item.style.display = "block";
-                    sumSpan.innerText = `$${sum}`;
-                    if (sum > 100) {
-                        sumTailSpan.innerText = `으로 $100를 넘습니다`;
-                    } else {
-                        sumTailSpan.innerText = `으로 $100를 넘지 못합니다`;
-                    }
-                } else {
-                    item.style.display = "none";
-                }
-            });
-        } else if (filter === "sweets") {
-            storeItems.forEach(function (item) {
-                if (item.classList.contains("sweets")) {
-                    const price = +item.querySelector(".store-item-price").innerText;
-                    sum += price;
-                    item.style.display = "block";
-                    sumSpan.innerText = `$${sum}`;
-                    if (sum > 100) {
-                        sumTailSpan.innerText = `으로 $100를 넘습니다`;
-                    } else {
-                        sumTailSpan.innerText = `으로 $100를 넘지 못합니다`;
-                    }
-                } else {
-                    item.style.display = "none";
-                }
-            });
-        } else if (filter === "doughnuts") {
-            storeItems.forEach(function (item) {
-                if (item.classList.contains("doughnuts")) {
-                    const price = +item.querySelector(".store-item-price").innerText;
-                    sum += price;
-                    item.style.display = "block";
-                    sumSpan.innerText = `$${sum}`;
-                    if (sum > 100) {
-                        sumTailSpan.innerText = `으로 $100를 넘습니다`;
-                    } else {
-                        sumTailSpan.innerText = `으로 $100를 넘지 못합니다`;
-                    }
-                } else {
-                    item.style.display = "none";
-                }
-            });
-        }
+const changeItemsDisplay = (els, display) => {
+    els.forEach((item) => {
+        item.style.display = display;
     });
-});
+};
+
+const sumAll = (arr) => arr.reduce((acc, item) => acc + item, 0);
+
+const getTextByComparison = (target, criteria) =>
+    target > criteria
+        ? `으로 $${criteria}를 넘습니다`
+        : `으로 $${criteria}를 넘지 못합니다`;
+
+const getNumberArrayOfElements = (els, targetClass) =>
+    els.reduce((acc, item) => {
+        const target = item.querySelector(targetClass);
+        const num = parseInt(target.innerText, 10);
+        acc.push(num);
+        return acc;
+    }, []);
+
+/*
+ * 완존 액션 함수
+ * */
+
+const getTargetStoreItem = (filter) => {
+    // 반복 로직과 조건 로직을 분리
+    // 미리 따로 분리해서 작업 할 수 있도록 반복과 강결합 로직 느슨하게 만들기
+    const storeItems = [...document.querySelectorAll(".store-item")];
+    if (filter === "all") {
+        return [storeItems, []];
+    } else {
+        return divideElementByClassContains(storeItems, filter);
+    }
+};
+
+const setSumTailInnerText = (sum) => {
+    const sumTailSpan = document.getElementById("sum-tail");
+    sumTailSpan.innerText = getTextByComparison(sum, 100);
+};
+
+const setSumInnerText = (sum) => {
+    const sumSpan = document.getElementById("sum");
+    sumSpan.innerText = `$${sum}`;
+};
+
+const setPriceSum = (els) => {
+    const priceArr = getNumberArrayOfElements(els, ".store-item-price"); // 가격 배열 뽑기 액션
+    const sum = sumAll(priceArr); // 합치기 계산
+    setSumTailInnerText(sum);
+    setSumInnerText(sum);
+};
+
+const buttonEventHandler = (e) => {
+    const filter = e.target.dataset.filter;
+    const [showEls, hideEls] = getTargetStoreItem(filter);
+
+    // 필터에 따른 노출 로직
+    changeItemsDisplay(showEls, "block");
+    changeItemsDisplay(hideEls, "none");
+
+    // 가격 조작 로직
+    setPriceSum(showEls);
+};
+
+const buttonDelegationEventHandler = (e) =>
+    delegate(e, ".filter-btn", buttonEventHandler);
+
+const setButtonEvent = () => {
+    const buttonParent = document.querySelector(".filter-btn").parentElement;
+    buttonParent.addEventListener("click", buttonDelegationEventHandler);
+};
+
+const init = () => {
+    setPriceSum([...document.querySelectorAll(".store-item")]);
+    setButtonEvent();
+};
+
+init();
