@@ -6,48 +6,36 @@
 
 main();
 
-let sum = 0;
-[...document.querySelectorAll(".store-item-price")].forEach(
-  (item) => (sum += +item.innerText)
-);
-innerText(sum);
-
-//클릭 이벤트 발생
-function filter(e) {
-  const filter = e.target.dataset.filter;
-
-  sumPrice(filter);
-}
-
 //계산하는 곳으로 넘어옴
-function sumPrice(filter) {
+function setSumPrice(filter) {
   const storeItems = document.querySelectorAll(".store-item");
   let sum = 0;
 
-  if (filter === "all") {
-    //show all items
-    storeItems.forEach(function (item) {
+  storeItems.forEach(function (item) {
+    if (filter === "all" || item.classList.contains(`${filter}`)) {
       const price = +item.querySelector(".store-item-price").innerText;
       sum += price;
-      item.style.display = "block";
-    });
-  } else {
-    storeItems.forEach(function (item) {
-      if (item.classList.contains(`${filter}`)) {
-        const price = +item.querySelector(".store-item-price").innerText;
-        sum += price;
-        item.style.display = "block";
-      } else {
-        item.style.display = "none";
-      }
-    });
-  }
+    }
+  });
 
-  innerText(sum);
+  setInnerText(sum);
+}
+
+//display 분리
+function showDisplay(filter) {
+  const storeItems = document.querySelectorAll(".store-item");
+
+  storeItems.forEach(function (item) {
+    if (filter === "all" || item.classList.contains(`${filter}`)) {
+      item.style.display = "block";
+    } else {
+      item.style.display = "none";
+    }
+  });
 }
 
 //계산 받아서 innnerText 실행
-function innerText(sum) {
+function setInnerText(sum) {
   const sumSpan = document.getElementById("sum");
   const sumTailSpan = document.getElementById("sum-tail");
 
@@ -59,8 +47,27 @@ function innerText(sum) {
   }
 }
 
+//기본 총합
+function defaultTotalPrice() {
+  const storeItemPriceArr = [...document.querySelectorAll(".store-item-price")];
+  const sum = storeItemPriceArr.reduce(function add(sum, currenValue) {
+    return sum + +currenValue.innerText;
+  }, 0);
+
+  setInnerText(sum);
+}
+
+//버튼 이벤트 발생
+function clickButtonEvent(e) {
+  const filter = e.target.dataset.filter;
+
+  setSumPrice(filter);
+  showDisplay(filter);
+}
+
 function main() {
+  defaultTotalPrice();
   const buttons = document.querySelector(".buttons");
 
-  buttons.addEventListener("click", filter);
+  buttons.addEventListener("click", clickButtonEvent);
 }
