@@ -61,11 +61,15 @@ function renderByMenu(filter) {
   });
 }
 
-function main() {
-  window.addEventListener('DOMContentLoaded', sumPrices());
+function addClickEventButton() {
   const btnGroup = document.querySelector('.btn-group');
   btnGroup.addEventListener('click', (e) => {
     const filter = e.target.dataset.filter;
     renderByMenu(filter);
   });
+}
+
+function main() {
+  window.addEventListener('DOMContentLoaded', sumPrices());
+  addClickEventButton();
 }
