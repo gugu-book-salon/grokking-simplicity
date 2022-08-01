@@ -6,12 +6,12 @@
 
 main();
 
-function isEqual(filter, value) {
-  return filter === value;
+function isEqual(a, b) {
+  return a === b;
 }
 
-function isSumGreaterThanValue(sum, value) {
-  if (sum > value) {
+function totalGreaterThanValue(total, value) {
+  if (total > value) {
     return `으로 $${value}를 넘습니다`;
   } else {
     return `으로 $${value}를 넘지 못합니다`;
@@ -38,10 +38,10 @@ function sumPrices(filter) {
   const totalPriceByMenu = itemListPriceTotal(filter);
   if (isEqual(filter, undefined)) {
     updateInnerText(sumSpan, `$${totalPrice}`);
-    updateInnerText(sumTailSpan, isSumGreaterThanValue(totalPrice, 100));
+    updateInnerText(sumTailSpan, totalGreaterThanValue(totalPrice, 100));
   } else {
     updateInnerText(sumSpan, `$${totalPriceByMenu}`);
-    updateInnerText(sumTailSpan, isSumGreaterThanValue(totalPriceByMenu, 100));
+    updateInnerText(sumTailSpan, totalGreaterThanValue(totalPriceByMenu, 100));
   }
 }
 
