@@ -6,11 +6,11 @@
 
 main();
 
-function matchFilter(filter, value) {
+function isEqual(filter, value) {
   return filter === value;
 }
 
-function compareValues(sum, value) {
+function isSumGreaterThanValue(sum, value) {
   if (sum > value) {
     return `으로 $${value}를 넘습니다`;
   } else {
@@ -28,7 +28,7 @@ function itemListPriceTotal(filter) {
 }
 
 function updateInnerText(element, content) {
-  return (element.innerText = content);
+  element.innerText = content;
 }
 
 function sumPrices(filter) {
@@ -36,17 +36,17 @@ function sumPrices(filter) {
   const sumTailSpan = document.getElementById('sum-tail');
   const totalPrice = itemListPriceTotal('all');
   const totalPriceByMenu = itemListPriceTotal(filter);
-  if (filter === undefined) {
+  if (isEqual(filter, undefined)) {
     updateInnerText(sumSpan, `$${totalPrice}`);
-    updateInnerText(sumTailSpan, compareValues(totalPrice, 100));
+    updateInnerText(sumTailSpan, isSumGreaterThanValue(totalPrice, 100));
   } else {
     updateInnerText(sumSpan, `$${totalPriceByMenu}`);
-    updateInnerText(sumTailSpan, compareValues(totalPriceByMenu, 100));
+    updateInnerText(sumTailSpan, isSumGreaterThanValue(totalPriceByMenu, 100));
   }
 }
 
 function showElements(item, filter, menu) {
-  if (matchFilter(filter, 'all') || matchFilter(filter, menu)) {
+  if (isEqual(filter, 'all') || isEqual(filter, menu)) {
     item.style.display = 'block';
   } else {
     item.style.display = 'none';
