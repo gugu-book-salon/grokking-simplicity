@@ -57,8 +57,11 @@ function isClassContains(element, findClass) {
   return element.classList.contains(findClass);
 }
 
-const manageSuccessClass = manageClass('success');
-const manageAlertClass = manageClass('alert');
+function getSuccessOrAlertClassManager(isSuccess, element) {
+  const manageSuccessClass = manageClass('success');
+  const manageAlertClass = manageClass('alert');
+  return (isSuccess ? manageSuccessClass : manageAlertClass)(element);
+}
 
 function setItemCount(count) {
   setInnerText(
@@ -153,9 +156,7 @@ function listItemClickHandler(listElement) {
 // ********* ACTION LOGIC ********* //
 // ******************************* //
 function showAction(element, text, isSuccess) {
-  const { addClassName, removeClassName } = (isSuccess ? manageSuccessClass : manageAlertClass)(
-    element
-  );
+  const { addClassName, removeClassName } = getSuccessOrAlertClassManager(isSuccess, element);
 
   addClassName();
   setTimeout(removeClassName, 3000);
