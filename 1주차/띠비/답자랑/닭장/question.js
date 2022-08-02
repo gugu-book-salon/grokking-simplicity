@@ -8,17 +8,18 @@ main();
 
 //계산하는 곳으로 넘어옴
 function setSumPrice(filter) {
-  const storeItems = document.querySelectorAll(".store-item");
-  let sum = 0;
+  const baseAmount = 100;
+  const storeItemsArr = [...document.querySelectorAll(".store-item")];
 
-  storeItems.forEach(function (item) {
-    if (filter === "all" || item.classList.contains(`${filter}`)) {
-      const price = +item.querySelector(".store-item-price").innerText;
-      sum += price;
-    }
-  });
+  const sum = storeItemsArr
+    .filter((el) => {
+      return el.classList.contains(`${filter}`) || filter === "all";
+    })
+    .reduce((sum, currentValue) => {
+      return sum + +currentValue.querySelector(".store-item-price").innerText;
+    }, 0);
 
-  setInnerText(sum);
+  setInnerText(sum, baseAmount);
 }
 
 //display 분리
@@ -35,26 +36,14 @@ function showDisplay(filter) {
 }
 
 //계산 받아서 innnerText 실행
-function setInnerText(sum) {
+function setInnerText(sum, baseAmount) {
   const sumSpan = document.getElementById("sum");
   const sumTailSpan = document.getElementById("sum-tail");
 
   sumSpan.innerText = `$${sum}`;
-  if (sum > 100) {
-    sumTailSpan.innerText = `으로 $100를 넘습니다`;
-  } else {
-    sumTailSpan.innerText = `으로 $100를 넘지 못합니다`;
-  }
-}
-
-//기본 총합
-function defaultTotalPrice() {
-  const storeItemPriceArr = [...document.querySelectorAll(".store-item-price")];
-  const sum = storeItemPriceArr.reduce(function add(sum, currenValue) {
-    return sum + +currenValue.innerText;
-  }, 0);
-
-  setInnerText(sum);
+  sumTailSpan.innerText = `으로 $${baseAmount}를 ${
+    sum > baseAmount ? "넘습니다" : "넘지 못합니다"
+  }`;
 }
 
 //버튼 이벤트 발생
@@ -66,8 +55,9 @@ function clickButtonEvent(e) {
 }
 
 function main() {
-  defaultTotalPrice();
-  const buttons = document.querySelector(".buttons");
+  setSumPrice("all");
+  showDisplay("all");
 
+  const buttons = document.querySelector(".buttons");
   buttons.addEventListener("click", clickButtonEvent);
 }
