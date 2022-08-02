@@ -42,33 +42,29 @@ const magicianCookies = [
     "마법사맛 쿠키"
 ];
 
-const setEventHandler = (id, { eventHandlers, data }) => {
-    const el = document.getElementById(id);
-    Object.entries(eventHandlers).forEach(([event, handler]) => {
-        el.addEventListener(event, (e) => handler(e, data));
-    });
-};
-
 const setEvent = (data) => {
-    Object.entries(data).forEach((arr) => {
-        setEventHandler(...arr);
+    Object.entries(data).forEach(([id, { eventHandlers, data }]) => {
+        const el = document.getElementById(id);
+        Object.entries(eventHandlers).forEach(([event, handler]) => {
+            el.addEventListener(event, (e) => handler(e, data));
+        });
     });
 };
 
-const changeArrayToLiString = (data) =>
+const changeArrayToListItemEls = (data) =>
     data.map((item) => `<li>${item}</li>`).join("");
 
 const setContentInnerHtml = (e, data) => {
-    document.getElementById("content").innerHTML = changeArrayToLiString(data);
+    document.getElementById("content").innerHTML = changeArrayToListItemEls(data);
 };
 
 const removeContentChild = () => {
     const content = document.getElementById("content");
     const filterInput = document.getElementById("filter-input");
-    const removeOne = [...content.children].find(
+    const target = [...content.children].find(
         (item) => item.innerText === filterInput.value
     );
-    content.removeChild(removeOne);
+    content.removeChild(target);
 };
 
 const init = (setting) => {
