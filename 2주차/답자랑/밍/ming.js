@@ -53,7 +53,7 @@ function getCookieListItems(cookies) {
   );
 }
 
-function setAppContentByCookies(cookies) {
+function setAppContentByCookieListItem(cookies) {
   const content = document.getElementById("content");
   content.innerHTML = getCookieListItems(cookies);
   return cookies;
@@ -66,8 +66,12 @@ function getAllCookies(...cookieArrays) {
   );
 }
 
-function applyButtonClickEventHandler({ button, getCookies }) {
-  button.addEventListener("click", () => setAppContentByCookies(getCookies()));
+function applyEventHandler({ element, event, handler }) {
+  element.addEventListener(event, handler);
+}
+
+function applyButtonClickEventHandler({ element, handler }) {
+  applyEventHandler(element, 'click', handler);
 }
 
 function getTextContentFromElement(element) {
@@ -113,7 +117,12 @@ function init() {
       button: document.getElementById("filter-button"),
       getCookies: getFilterdCookies,
     },
-  ].forEach(applyButtonClickEventHandler);
+  ]
+  .map(({ button, getCookies }) => ({
+    button,
+    handler: () => setAppContentByCookieListItem(getCookies()),
+  }))
+  .forEach(applyButtonClickEventHandler);
 }
 
 init();
