@@ -1,8 +1,5 @@
-// https://codesandbox.io/s/hamsuhyeongkoding-2juca-forked-9tyy05?file=/src/index.js
-
 import "./styles.css";
 
-const cookies = [];
 const assultCookies = [
     "크런치초코칩 쿠키",
     "다크카카오 쿠키",
@@ -44,84 +41,71 @@ const magicianCookies = [
     "눈설탕맛 쿠키",
     "마법사맛 쿠키"
 ];
-let filteredCookies = [];
 
-function mergeCookie() {
-    for (let i = 0; i < assultCookies.length; i++) {
-        cookies.push(assultCookies[i]);
-    }
-    for (let i = 0; i < defensiveCookies.length; i++) {
-        cookies.push(defensiveCookies[i]);
-    }
-    for (let i = 0; i < magicianCookies.length; i++) {
-        cookies.push(magicianCookies[i]);
-    }
-}
+const setEventHandler = (id, { eventHandlers, data }) => {
+    const el = document.getElementById(id);
+    Object.entries(eventHandlers).forEach(([event, handler]) => {
+        el.addEventListener(event, (e) => handler(e, data));
+    });
+};
 
-const content = document.getElementById("content");
-const allButton = document.getElementById("all");
-const assultButton = document.getElementById("assult");
-const defensiveButton = document.getElementById("defensive");
-const magicianButton = document.getElementById("magician");
-const filterInput = document.getElementById("filter-input");
-const filterButton = document.getElementById("filter-button");
+const setEvent = (data) => {
+    Object.entries(data).forEach((arr) => {
+        setEventHandler(...arr);
+    });
+};
 
-let appContent = "";
+const changeArrayToLiString = (data) =>
+    data.map((item) => `<li>${item}</li>`).join("");
 
-allButton.addEventListener("click", () => {
-    mergeCookie();
-    content.innerHTML = "";
-    for (let i = 0; i < cookies.length; i++) {
-        filteredCookies.push(cookies[i]);
-        appContent += `<li>${cookies[i]}</li>`;
-    }
-    content.innerHTML = appContent;
-    appContent = "";
-});
+const setContentInnerHtml = (e, data) => {
+    document.getElementById("content").innerHTML = changeArrayToLiString(data);
+};
 
-assultButton.addEventListener("click", () => {
-    content.innerHTML = "";
-    for (let i = 0; i < assultCookies.length; i++) {
-        filteredCookies.push(cookies[i]);
-        appContent += `<li>${assultCookies[i]}</li>`;
-    }
-    content.innerHTML = appContent;
-    appContent = "";
-});
+const removeContentChild = () => {
+    const content = document.getElementById("content");
+    const filterInput = document.getElementById("filter-input");
+    const removeOne = [...content.children].find(
+        (item) => item.innerText === filterInput.value
+    );
+    content.removeChild(removeOne);
+};
 
-defensiveButton.addEventListener("click", () => {
-    content.innerHTML = "";
-    for (let i = 0; i < defensiveCookies.length; i++) {
-        filteredCookies.push(cookies[i]);
-        appContent += `<li>${defensiveCookies[i]}</li>`;
-    }
-    content.innerHTML = appContent;
-    appContent = "";
-});
+const init = (setting) => {
+    setEvent(setting);
+};
 
-magicianButton.addEventListener("click", () => {
-    content.innerHTML = "";
-    for (let i = 0; i < magicianCookies.length; i++) {
-        appContent += `<li>${magicianCookies[i]}</li>`;
-    }
-    content.innerHTML = appContent;
-    appContent = "";
-});
-
-filterButton.addEventListener("click", () => {
-    const contentChildren = content.children;
-    filteredCookies = [];
-
-    for (let children of contentChildren) {
-        if (!children.textContent.includes(filterInput.value)) {
-            filteredCookies.push(children.textContent);
+const filterSetting = {
+    all: {
+        data: [...assultCookies, ...defensiveCookies, ...magicianCookies],
+        eventHandlers: {
+            click: setContentInnerHtml
+        }
+    },
+    assult: {
+        data: [...assultCookies],
+        eventHandlers: {
+            click: setContentInnerHtml
+        }
+    },
+    defensive: {
+        data: [...defensiveCookies],
+        eventHandlers: {
+            click: setContentInnerHtml
+        }
+    },
+    magician: {
+        data: [...magicianCookies],
+        eventHandlers: {
+            click: setContentInnerHtml
+        }
+    },
+    "filter-button": {
+        data: {},
+        eventHandlers: {
+            click: removeContentChild
         }
     }
+};
 
-    content.innerHTML = "";
-    for (let i = 0; i < filteredCookies.length; i++) {
-        appContent += `<li>${filteredCookies[i]}</li>`;
-    }
-    content.innerHTML = appContent;
-    filterInput.value = "";
-});
+init(filterSetting);
