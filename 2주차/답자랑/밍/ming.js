@@ -80,7 +80,7 @@ function getCurrentCookies() {
   return contentChildren.map(getTextContentFromElement);
 }
 
-const getFilterInputValue = () => {
+function getFilterInputValue() {
   const filterInput = document.getElementById("filter-input");
   return filterInput.value;
 };
@@ -95,7 +95,7 @@ function init() {
   [
     {
       button: document.getElementById("all"),
-      getCookies: () => getAllCookies(assultCookies, defensiveCookies, magicianCookies)
+      getCookies: () => getAllCookies(assultCookies, defensiveCookies, magicianCookies),
     },
     {
       button: document.getElementById("assult"),
@@ -107,7 +107,7 @@ function init() {
     },
     {
       button: document.getElementById("magician"),
-      getCookies: () => magicianCookies
+      getCookies: () => magicianCookies,
     },
     {
       button: document.getElementById("filter-button"),
