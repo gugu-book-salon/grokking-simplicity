@@ -2,8 +2,50 @@
 
 import "./styles.css";
 
-const cookies = [];
-const assultCookies = [
+function withArrayCopy(array, modify) {
+  let copy = array.slice();
+  modify(copy);
+  return copy;
+}
+
+function push(array, element) {
+  return withArrayCopy(array, function (copy) {
+    copy.push(element);
+  });
+}
+
+function forEach(array, callback) {
+  for (let i = 0; i < array.length; i++) {
+    callback(array[i]);
+  }
+}
+
+function mergeCookie(cookiesName) {
+  const cookies = [];
+  forEach(cookiesName, function (cookie) {
+    push(cookies, cookie);
+  });
+}
+
+function compare(a, b) {
+  return a === b;
+}
+
+function when(test, callback) {
+  if (test) {
+    callback();
+  }
+}
+
+function displayCookie(content, appContent, cookiesName) {
+  forEach(cookiesName, function (cookie) {
+    appContent += `<li>${cookie}</li>`;
+  });
+  content.innerHTML = appContent;
+}
+
+function displayCookieListByFilter(event, content, appContent) {
+  const assultCookies = [
     "크런치초코칩 쿠키",
     "다크카카오 쿠키",
     "실론나이트 쿠키",
@@ -16,9 +58,9 @@ const assultCookies = [
     "웨어울프맛 쿠키",
     "근육맛 쿠키",
     "공주맛 쿠키",
-    "용감한 쿠키"
-];
-const defensiveCookies = [
+    "용감한 쿠키",
+  ];
+  const defensiveCookies = [
     "휘낭시에맛 쿠키",
     "와일드베리맛 쿠키",
     "코코아맛 쿠키",
@@ -29,9 +71,9 @@ const defensiveCookies = [
     "우유맛 쿠키",
     "아보카도맛 쿠키",
     "용사맛 쿠키",
-    "딸기맛 쿠키"
-];
-const magicianCookies = [
+    "딸기맛 쿠키",
+  ];
+  const magicianCookies = [
     "클로티드 크림 쿠키",
     "서리여왕 쿠키",
     "펌킨파이맛 쿠키",
@@ -42,86 +84,70 @@ const magicianCookies = [
     "에스프레소맛 쿠키",
     "감초맛 쿠키",
     "눈설탕맛 쿠키",
-    "마법사맛 쿠키"
-];
-let filteredCookies = [];
+    "마법사맛 쿠키",
+  ];
 
-function mergeCookie() {
-    for (let i = 0; i < assultCookies.length; i++) {
-        cookies.push(assultCookies[i]);
-    }
-    for (let i = 0; i < defensiveCookies.length; i++) {
-        cookies.push(defensiveCookies[i]);
-    }
-    for (let i = 0; i < magicianCookies.length; i++) {
-        cookies.push(magicianCookies[i]);
-    }
+  const cookiesType = event.target.id;
+
+  const allCookies = mergeCookie([
+    ...assultCookies,
+    ...defensiveCookies,
+    ...magicianCookies,
+  ]);
+
+  const cookieTab = ["all", "assult", "defensive", "magician"];
+  const cookieFilter = [
+    allCookies,
+    assultCookies,
+    defensiveCookies,
+    magicianCookies,
+  ];
+
+  forEach(cookieTab, function (cookie) {
+    when(compare(cookiesType, cookie), function () {
+      displayCookie(
+        content,
+        appContent,
+        cookieFilter[cookieTab.indexOf(cookie)]
+      );
+    });
+  });
 }
 
-const content = document.getElementById("content");
-const allButton = document.getElementById("all");
-const assultButton = document.getElementById("assult");
-const defensiveButton = document.getElementById("defensive");
-const magicianButton = document.getElementById("magician");
-const filterInput = document.getElementById("filter-input");
-const filterButton = document.getElementById("filter-button");
+function deleteCookie(content, appContent) {
+  const filteredCookies = [];
+  const filterInput = document.getElementById("filter-input");
+  const contentChildren = content.children;
+  const childrenTextContent = children.textContent;
 
-let appContent = "";
+  forEach(contentChildren, function (children) {
+    when(!childrenTextContent.includes(filterInput.value), function () {
+      filteredCookies.push(children.textContent);
+    });
+  });
+  displayCookie(content, appContent, filteredCookies);
+  filterInput.value = "";
+}
 
-allButton.addEventListener("click", () => {
-    mergeCookie();
-    content.innerHTML = "";
-    for (let i = 0; i < cookies.length; i++) {
-        filteredCookies.push(cookies[i]);
-        appContent += `<li>${cookies[i]}</li>`;
-    }
-    content.innerHTML = appContent;
-    appContent = "";
-});
+function addButtonClickedEventListener(button, eventName, callback) {
+  button.addEventListener(eventName, callback);
+}
 
-assultButton.addEventListener("click", () => {
-    content.innerHTML = "";
-    for (let i = 0; i < assultCookies.length; i++) {
-        filteredCookies.push(cookies[i]);
-        appContent += `<li>${assultCookies[i]}</li>`;
-    }
-    content.innerHTML = appContent;
-    appContent = "";
-});
+function addClickedButton() {
+  const content = document.getElementById("content");
+  const cookieList = document.getElementById("cookie-list");
+  const filterButton = document.getElementById("filter-button");
+  let appContent = "";
+  addButtonClickedEventListener(cookieList, "click", (event) => {
+    displayCookieListByFilter(event, content, appContent);
+  });
+  addButtonClickedEventListener(filterButton, "click", () => {
+    deleteCookie(content, appContent);
+  });
+}
 
-defensiveButton.addEventListener("click", () => {
-    content.innerHTML = "";
-    for (let i = 0; i < defensiveCookies.length; i++) {
-        filteredCookies.push(cookies[i]);
-        appContent += `<li>${defensiveCookies[i]}</li>`;
-    }
-    content.innerHTML = appContent;
-    appContent = "";
-});
+function filteredCookieButton() {
+  addClickedButton();
+}
 
-magicianButton.addEventListener("click", () => {
-    content.innerHTML = "";
-    for (let i = 0; i < magicianCookies.length; i++) {
-        appContent += `<li>${magicianCookies[i]}</li>`;
-    }
-    content.innerHTML = appContent;
-    appContent = "";
-});
-
-filterButton.addEventListener("click", () => {
-    const contentChildren = content.children;
-    filteredCookies = [];
-
-    for (let children of contentChildren) {
-        if (!children.textContent.includes(filterInput.value)) {
-            filteredCookies.push(children.textContent);
-        }
-    }
-
-    content.innerHTML = "";
-    for (let i = 0; i < filteredCookies.length; i++) {
-        appContent += `<li>${filteredCookies[i]}</li>`;
-    }
-    content.innerHTML = appContent;
-    filterInput.value = "";
-});
+filteredCookieButton();
