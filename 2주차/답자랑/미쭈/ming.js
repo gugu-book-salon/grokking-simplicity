@@ -1,4 +1,5 @@
 // https://codesandbox.io/s/dogsyal-2juca-bulbyeonseong-forked-11yych?file=/src/index.js:0-2730
+
 import './styles.css';
 
 const assultCookies = [
@@ -51,32 +52,23 @@ function isEqual(a, b) {
   return a === b;
 }
 
-function mergeCookie(cookieTypes) {
-  const cookies = [];
-  for (let i = 0; i < cookieTypes.length; i++) {
-    cookies.push(cookieTypes[i]);
-  }
-  return cookies;
-}
-
-function renderCookieList(content, appContent, cookieTypes) {
-  for (let i = 0; i < cookieTypes.length; i++) {
-    appContent += `<li>${cookieTypes[i]}</li>`;
-  }
-  content.innerHTML = appContent;
-}
-
 function addEventListener(element, eventType, cb) {
   element.addEventListener(eventType, cb);
 }
 
+function renderCookieList(content, appContent, cookieTypes) {
+  console.log(appContent);
+  cookieTypes.forEach((cookie) => (appContent += `<li>${cookie}</li>`));
+  content.innerHTML = appContent;
+}
+
 function renderCookieListByMenu(event, content, appContent) {
   let target = event.target.id;
-  const cookieListAll = mergeCookie([
+  const cookieListAll = [
     ...assultCookies,
     ...defensiveCookies,
     ...magicianCookies,
-  ]);
+  ];
   const menu = ['all', 'assult', 'defensive', 'magician'];
   const list = [
     cookieListAll,
@@ -84,22 +76,22 @@ function renderCookieListByMenu(event, content, appContent) {
     defensiveCookies,
     magicianCookies,
   ];
-  for (let i = 0; i < menu.length; i++) {
-    if (isEqual(target, menu[i])) {
-      renderCookieList(content, appContent, list[i]);
+  menu.forEach((item, index) => {
+    if (isEqual(target, item)) {
+      renderCookieList(content, appContent, list[index]);
     }
-  }
+  });
 }
 
 function removeSpecifiedCookieName(content, appContent) {
   const filterInput = document.getElementById('filter-input');
   const contentChildren = content.children;
   let filteredCookies = [];
-  for (let children of contentChildren) {
-    if (!children.textContent.includes(filterInput.value)) {
-      filteredCookies.push(children.textContent);
+  [...contentChildren].forEach((cookie) => {
+    if (!cookie.textContent.includes(filterInput.value)) {
+      filteredCookies.push(cookie.textContent);
     }
-  }
+  });
   renderCookieList(content, appContent, filteredCookies);
   filterInput.value = '';
 }
