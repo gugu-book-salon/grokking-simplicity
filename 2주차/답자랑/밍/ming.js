@@ -66,12 +66,8 @@ function getAllCookies(...cookieArrays) {
   );
 }
 
-function applyEventHandler({ element, event, handler }) {
-  element.addEventListener(event, handler);
-}
-
-function applyButtonClickEventHandler({ element, handler }) {
-  applyEventHandler(element, 'click', handler);
+function applyClickEventHandler({ element, handler }) {
+  element.addEventListener('click', handler);
 }
 
 function getTextContentFromElement(element) {
@@ -122,7 +118,7 @@ function init() {
     button,
     handler: () => setAppContentByCookieListItem(getCookies()),
   }))
-  .forEach(applyButtonClickEventHandler);
+  .forEach(applyClickEventHandler);
 }
 
 init();
