@@ -57,7 +57,6 @@ function addEventListener(element, eventType, cb) {
 }
 
 function renderCookieList(content, appContent, cookieTypes) {
-  console.log(appContent);
   cookieTypes.forEach((cookie) => (appContent += `<li>${cookie}</li>`));
   content.innerHTML = appContent;
 }
