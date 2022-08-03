@@ -52,17 +52,14 @@ function isEqual(a, b) {
   return a === b;
 }
 
-function addEventListener(element, eventType, cb) {
-  element.addEventListener(eventType, cb);
+function renderCookieList(content, cookieTypes) {
+  const cookieList = cookieTypes
+    .map((cookie) => `<li>${cookie}</li>`)
+    .reduce((pre, cur) => pre + cur);
+  content.innerHTML = cookieList;
 }
 
-function renderCookieList(content, appContent, cookieTypes) {
-  cookieTypes.forEach((cookie) => (appContent += `<li>${cookie}</li>`));
-  content.innerHTML = appContent;
-}
-
-function renderCookieListByMenu(event, content, appContent) {
-  let target = event.target.id;
+function renderCookieListByMenu(target, content) {
   const cookieListAll = [
     ...assultCookies,
     ...defensiveCookies,
@@ -77,21 +74,26 @@ function renderCookieListByMenu(event, content, appContent) {
   ];
   menu.forEach((item, index) => {
     if (isEqual(target, item)) {
-      renderCookieList(content, appContent, list[index]);
+      renderCookieList(content, list[index]);
     }
   });
 }
 
-function removeSpecifiedCookieName(content, appContent) {
-  const filterInput = document.getElementById('filter-input');
-  const contentChildren = content.children;
+function filteredCookieArray(contentChildren, filterInput) {
   let filteredCookies = [];
   [...contentChildren].forEach((cookie) => {
     if (!cookie.textContent.includes(filterInput.value)) {
       filteredCookies.push(cookie.textContent);
     }
   });
-  renderCookieList(content, appContent, filteredCookies);
+  return filteredCookies;
+}
+
+function removeSpecifiedCookieName(content) {
+  const filterInput = document.getElementById('filter-input');
+  const contentChildren = content.children;
+  let filteredCookies = filteredCookieArray(contentChildren, filterInput);
+  renderCookieList(content, filteredCookies);
   filterInput.value = '';
 }
 
@@ -99,12 +101,12 @@ function addClickEventButton() {
   const content = document.getElementById('content');
   const cookieBtnGroup = document.querySelector('.cookie-btn-group');
   const filterButton = document.getElementById('filter-button');
-  let appContent = '';
-  addEventListener(cookieBtnGroup, 'click', (event) => {
-    renderCookieListByMenu(event, content, appContent);
+  cookieBtnGroup.addEventListener('click', (event) => {
+    let target = event.target.id;
+    renderCookieListByMenu(target, content);
   });
-  addEventListener(filterButton, 'click', () => {
-    removeSpecifiedCookieName(content, appContent);
+  filterButton.addEventListener('click', () => {
+    removeSpecifiedCookieName(content);
   });
 }
 
