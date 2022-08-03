@@ -1,5 +1,3 @@
-// https://codesandbox.io/s/dazzling-mcnulty-h5o9dk?file=/src/index.js:0-4305
-
 // 당신은 구구 마트에 입사한 신입 개발자입니다
 // 취업난 속에서도 취업을 하신 여러분 축하 드립니다
 
@@ -8,84 +6,56 @@
 // 여러분들의 선배가 짜놓은 장바구니 추가 페이지에 수량을 같이 넣어서 저장시키고 싶다는 요구입니다
 // 신입 사원인 여러분은 함수형 코딩 책에서 배운 것을 바탕으로 리팩트링과 함께 수량 데이터를 추가해서 출력하는 기능 까지 구현하게 됩니다
 
-// PR2
-// 변덕스러운 사장 박훌린은 두번째 미션을 줍니다
-// 당장 오늘까지 사원들이 쓸 TODO LIST 를 구현해오라는 미션입니다
-// 신입 사원이 여러분들은 고민을 하겠지만 큰 문제가 없습니다 여러분들이 구현한 계층형 설계가 잘된 장바구니 페이지를 이용하면 되니까요!
-// 장바구니에는 상품명과 개수가 저장 되었지만 TODO LIST 에는 할일 이름과 마감 시간, 중요도 데이터가 들어가 있습니다
-// 장바구니에서 계층화 시킨 함수들을 이용해서 코드 수정을 최소화 하여 TODO LIST를 구현해주세요
+const allInputClear = (...inputs) =>
+    inputs.forEach((input) => (input.value = ""));
 
-const addItemsAction = document.querySelector(".addItems-action");
-const input = document.querySelector(".addItems-input");
-const submit = document.querySelector(".addItems-submit");
-
-//Display items container
-const list = document.querySelector(".list");
-const displayItemsAction = document.querySelector(".displayItems-action");
-const clear = document.querySelector(".displayItems-clear");
-
-//Add event listeners
-//Submit listener
-submit.addEventListener("click", addItem);
-//Check for local storage
-document.addEventListener("DOMContentLoaded", displayStorage);
-//Clear list
-clear.addEventListener("click", removeItems);
-//Listen to list to delete individual items
-list.addEventListener("click", removeSingleItem);
-
-//functions
-function addItem(event) {
+function addItem(event, { addItemsAction, list, input1, input2 }) {
     event.preventDefault();
-    let value = input.value;
-    if (value === "") {
-        showAction(addItemsAction, "Please add grocery item", false);
+
+    const name = input1.value;
+    const count = input2.value;
+
+    const isEmpty = name.length === 0 || count.length === 0;
+
+    if (isEmpty) {
+        showMessage(addItemsAction, "alert", "Please add grocery item");
     } else {
-        showAction(addItemsAction, `${value} added to the list`, true);
-        createItem(value);
-        updateStorage(value);
+        showMessage(addItemsAction, "success", `${name} added to the list`);
+        createItem(list, name, count);
+        updateStorage({ name, count });
     }
+    allInputClear(input1, input2);
 }
 
-function showAction(element, text, value) {
-    if (value === true) {
-        element.classList.add("success");
-        element.innerText = text;
-        input.value = "";
-        setTimeout(function () {
-            element.classList.remove("success");
-        }, 3000);
-    } else {
-        element.classList.add("alert");
-        element.innerText = text;
-        input.value = "";
-        setTimeout(function () {
-            element.classList.remove("alert");
-        }, 3000);
-    }
+const showMessage = (element, showClass, text) => {
+    element.classList.add(showClass);
+    element.innerText = text;
+    setTimeout(function () {
+        element.classList.remove(showClass);
+    }, 3000);
+};
+
+const groceryItemTmpl = ({ name, count }) => `
+  <div>
+    <span class="grocery-item__title">${name}</span>
+    <span>${count}개</span>
+  </div>
+  <a href="#" class="grocery-item__link">
+    <i class="far fa-trash-alt"></i>
+  </a>
+`;
+
+function createItem(parent, name, count) {
+    let newItemWrapper = document.createElement("div");
+    newItemWrapper.classList.add("grocery-item");
+
+    newItemWrapper.innerHTML = groceryItemTmpl({ name, count });
+
+    parent.appendChild(newItemWrapper);
 }
 
-// create item
-function createItem(value) {
-    let parent = document.createElement("div");
-    parent.classList.add("grocery-item");
-
-    // let title = document.createElement('h4');
-    //     title.classList.add('grocery-item__title');
-
-    parent.innerHTML = `<h4 class="grocery-item__title">${value}</h4>
-    <a href="#" class="grocery-item__link">
-        <i class="far fa-trash-alt"></i>
-    </a>`;
-
-    list.appendChild(parent);
-}
-
-//update storage
 function updateStorage(value) {
-    let groceryList;
-
-    groceryList = localStorage.getItem("groceryList")
+    const groceryList = localStorage.getItem("groceryList")
         ? JSON.parse(localStorage.getItem("groceryList"))
         : [];
 
@@ -93,61 +63,102 @@ function updateStorage(value) {
     localStorage.setItem("groceryList", JSON.stringify(groceryList));
 }
 
-//display items in local storage
-function displayStorage() {
-    let exists = localStorage.getItem("groceryList");
-
-    if (exists) {
-        let storageItems = JSON.parse(localStorage.getItem("groceryList"));
-        storageItems.forEach(function (element) {
-            createItem(element);
-        });
-    }
-}
-
-//remove all items
-function removeItems() {
-    //delete from local storage
+function removeItems(_, { list, displayItemsAction, input1, input2 }) {
     localStorage.removeItem("groceryList");
     let items = document.querySelectorAll(".grocery-item");
 
     if (items.length > 0) {
-        //remove each item from the list
-        showAction(displayItemsAction, "All items deleted", false);
-        items.forEach(function (element) {
-            list.removeChild(element);
-        });
+        showMessage(displayItemsAction, "success", "All items deleted");
+        allInputClear(input1, input2);
+        items.forEach((element) => list.removeChild(element));
     } else {
-        showAction(displayItemsAction, "No more items to delete", false);
+        showMessage(displayItemsAction, "alert", "No more items to delete");
     }
 }
 
-//remove single item
-
-function removeSingleItem(event) {
+function removeSingleItem(event, { list, displayItemsAction, input1, input2 }) {
     event.preventDefault();
 
     let link = event.target.parentElement;
     if (link.classList.contains("grocery-item__link")) {
-        let text = link.previousElementSibling.innerHTML;
+        let name = link.previousElementSibling.children[0].innerHTML;
+
         let groceryItem = event.target.parentElement.parentElement;
-        //remove from list
-
         list.removeChild(groceryItem);
-        showAction(displayItemsAction, `${text} removed from the list`, true);
+        editStorage(name);
 
-        //remove from local storage
-        editStorage(text);
+        showMessage(displayItemsAction, "success", `${name} removed from the list`);
+        allInputClear(input1, input2);
     }
 }
 
-function editStorage(item) {
+function editStorage(name) {
     let groceryItems = JSON.parse(localStorage.getItem("groceryList"));
-    let index = groceryItems.indexOf(item);
+    let index = groceryItems.findIndex((item) => name === item.name);
 
     groceryItems.splice(index, 1);
-    //first delete existing list
     localStorage.removeItem("groceryList");
-    //add new updated/edited list
     localStorage.setItem("groceryList", JSON.stringify(groceryItems));
 }
+
+function displayStorage() {
+    const list = document.querySelector(".list");
+    let localList = localStorage.getItem("groceryList");
+
+    if (localList) {
+        let storageItems = JSON.parse(localList);
+        storageItems.forEach((item) => createItem(list, item.name, item.count));
+    }
+}
+
+const eventSetting = {
+    ".addItems-submit": {
+        data: {
+            list: document.querySelector(".list"),
+            addItemsAction: document.querySelector(".addItems-action"),
+            input1: document.querySelector("#addItems-input-name"),
+            input2: document.querySelector("#addItems-input-count")
+        },
+        eventHandlers: {
+            click: addItem
+        }
+    },
+    ".displayItems-clear": {
+        data: {
+            list: document.querySelector(".list"),
+            displayItemsAction: document.querySelector(".displayItems-action"),
+            input1: document.querySelector("#addItems-input-name"),
+            input2: document.querySelector("#addItems-input-count")
+        },
+        eventHandlers: {
+            click: removeItems
+        }
+    },
+    ".list": {
+        data: {
+            list: document.querySelector(".list"),
+            displayItemsAction: document.querySelector(".displayItems-action"),
+            input1: document.querySelector("#addItems-input-name"),
+            input2: document.querySelector("#addItems-input-count")
+        },
+        eventHandlers: {
+            click: removeSingleItem
+        }
+    }
+};
+
+const setEvent = (data) => {
+    Object.entries(data).forEach(([query, { eventHandlers, data }]) => {
+        const el = document.querySelector(query);
+        Object.entries(eventHandlers).forEach(([event, handler]) => {
+            el.addEventListener(event, (e) => handler(e, data));
+        });
+    });
+};
+
+const init = ({ eventSetting }) => {
+    displayStorage();
+    setEvent(eventSetting);
+};
+
+init({ eventSetting });
