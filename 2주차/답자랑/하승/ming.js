@@ -31,8 +31,8 @@ function compare(a, b) {
   return a === b;
 }
 
-function when(test, callback) {
-  if (test) {
+function when(predicate, callback) {
+  if (predicate) {
     callback();
   }
 }
