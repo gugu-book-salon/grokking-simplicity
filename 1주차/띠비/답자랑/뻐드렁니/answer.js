@@ -12,6 +12,18 @@ function isSelected(item, selectedItem) {
 
 function getTotalPrice(storeItems) {
   //reduce 함수 구현
+  const totalPrice = Array.from(storeItems).reduce((acc, el, i, src) => {
+    const item = src[i];
+    if (item.style.display !== "none") {
+      const price = parseInt(
+        item.querySelector(".store-item-price").innerText,
+        10
+      );
+      return addTwo(acc, price);
+    }
+    return acc;
+  }, 0);
+  return totalPrice;
 }
 
 function setTotalPrice(storeItems){
@@ -21,7 +33,7 @@ function setTotalPrice(storeItems){
 }
 
 function setStyle(item, style) {
-  return (item.style.display = style);
+  item.style.display = style;
 }
 
 function addTwo(a, b) {
@@ -50,6 +62,9 @@ function renderSelectedItem(storeItems,selectedItem) {
       setStyle(item, "none");
     }
   });
+  const sum = getTotalPrice(storeItems);
+  setSumSpan(sum);
+  setSumTailSpan(sum);
 }
 
 function main() {
