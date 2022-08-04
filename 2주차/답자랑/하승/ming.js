@@ -146,8 +146,8 @@ function addClickedButton() {
   });
 }
 
-function filteredCookieButton() {
+function main() {
   addClickedButton();
 }
 
-filteredCookieButton();
+main();
