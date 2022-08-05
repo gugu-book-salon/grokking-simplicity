@@ -3,7 +3,7 @@
 import "./styles.css";
 
 function withArrayCopy(array, modify) {
-  let copy = array.slice();
+  let copy = [...array];
   modify(copy);
   return copy;
 }
@@ -14,15 +14,10 @@ function push(array, element) {
   });
 }
 
-function forEach(array, callback) {
-  for (let i = 0; i < array.length; i++) {
-    callback(array[i]);
-  }
-}
-
 function mergeCookie(cookiesName) {
   const cookies = [];
-  forEach(cookiesName, function (cookie) {
+
+  cookiesName.forEach(function (cookie) {
     push(cookies, cookie);
   });
 }
@@ -36,15 +31,15 @@ function when(predicate, callback) {
     callback();
   }
 }
+function displayCookie(content, cookiesName) {
 
-function displayCookie(content, appContent, cookiesName) {
-  forEach(cookiesName, function (cookie) {
-    appContent += `<li>${cookie}</li>`;
+  const cookieLists = cookiesName.map(function (cookie) {
+    return `<li>${cookie}</li>`;
   });
-  content.innerHTML = appContent;
+  content.innerHTML = cookieLists.join("");
 }
 
-function displayCookieListByFilter(event, content, appContent) {
+function displayCookieListByFilter(event, content) {
   const assultCookies = [
     "크런치초코칩 쿠키",
     "다크카카오 쿠키",
@@ -103,30 +98,28 @@ function displayCookieListByFilter(event, content, appContent) {
     magicianCookies,
   ];
 
-  forEach(cookieTab, function (cookie) {
+  cookieTab.forEach(function (cookie) {
     when(compare(cookiesType, cookie), function () {
-      displayCookie(
-        content,
-        appContent,
-        cookieFilter[cookieTab.indexOf(cookie)]
-      );
+      displayCookie(content, cookieFilter[cookieTab.indexOf(cookie)]);
     });
   });
 }
 
-function deleteCookie(content, appContent) {
+function deleteCookie(content) {
   const filteredCookies = [];
   const filterInput = document.getElementById("filter-input");
   const contentChildren = content.children;
   const childrenTextContent = children.textContent;
 
-  forEach(contentChildren, function (children) {
+  contentChildren.forEach(function (children) {
     when(!childrenTextContent.includes(filterInput.value), function () {
       filteredCookies.push(children.textContent);
     });
   });
-  displayCookie(content, appContent, filteredCookies);
-  filterInput.value = "";
+
+  //displayCookie 함수는 이제 2개의 인자를 받음
+  displayCookie(content, filteredCookies);
+  // filterInput.value = "";
 }
 
 function addButtonClickedEventListener(button, eventName, callback) {
@@ -134,15 +127,15 @@ function addButtonClickedEventListener(button, eventName, callback) {
 }
 
 function addClickedButton() {
-  const content = document.getElementById("content");
+  const content = document.getElementById("content"); //쿠키를 보여줄 영역
   const cookieList = document.getElementById("cookie-list");
   const filterButton = document.getElementById("filter-button");
-  let appContent = "";
+  // let appContent = "";
   addButtonClickedEventListener(cookieList, "click", (event) => {
-    displayCookieListByFilter(event, content, appContent);
+    displayCookieListByFilter(event, content);
   });
   addButtonClickedEventListener(filterButton, "click", () => {
-    deleteCookie(content, appContent);
+    deleteCookie(content);
   });
 }
 
