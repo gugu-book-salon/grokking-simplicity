@@ -1,6 +1,7 @@
 import "./styles.css";
 
 const cookies = [];
+
 const assultCookies = [
   "크런치초코칩 쿠키",
   "다크카카오 쿠키",
@@ -42,84 +43,79 @@ const magicianCookies = [
   "눈설탕맛 쿠키",
   "마법사맛 쿠키"
 ];
+
+const cookieTypeDict = {
+  assult: assultCookies,
+  defensive: defensiveCookies,
+  magician: magicianCookies
+};
+
 let filteredCookies = [];
 
-function mergeCookie() {
-  for (let i = 0; i < assultCookies.length; i++) {
-    cookies.push(assultCookies[i]);
-  }
-  for (let i = 0; i < defensiveCookies.length; i++) {
-    cookies.push(defensiveCookies[i]);
-  }
-  for (let i = 0; i < magicianCookies.length; i++) {
-    cookies.push(magicianCookies[i]);
-  }
-}
-
 const content = document.getElementById("content");
-const allButton = document.getElementById("all");
-const assultButton = document.getElementById("assult");
-const defensiveButton = document.getElementById("defensive");
-const magicianButton = document.getElementById("magician");
 const filterInput = document.getElementById("filter-input");
 const filterButton = document.getElementById("filter-button");
 
 let appContent = "";
 
-allButton.addEventListener("click", () => {
-  mergeCookie();
-  content.innerHTML = "";
-  for (let i = 0; i < cookies.length; i++) {
-    filteredCookies.push(cookies[i]);
-    appContent += `<li>${cookies[i]}</li>`;
-  }
-  content.innerHTML = appContent;
-  appContent = "";
-});
-
-assultButton.addEventListener("click", () => {
-  content.innerHTML = "";
-  for (let i = 0; i < assultCookies.length; i++) {
-    filteredCookies.push(cookies[i]);
-    appContent += `<li>${assultCookies[i]}</li>`;
-  }
-  content.innerHTML = appContent;
-  appContent = "";
-});
-
-defensiveButton.addEventListener("click", () => {
-  content.innerHTML = "";
-  for (let i = 0; i < defensiveCookies.length; i++) {
-    filteredCookies.push(cookies[i]);
-    appContent += `<li>${defensiveCookies[i]}</li>`;
-  }
-  content.innerHTML = appContent;
-  appContent = "";
-});
-
-magicianButton.addEventListener("click", () => {
-  content.innerHTML = "";
-  for (let i = 0; i < magicianCookies.length; i++) {
-    appContent += `<li>${magicianCookies[i]}</li>`;
-  }
-  content.innerHTML = appContent;
-  appContent = "";
-});
-
-filterButton.addEventListener("click", () => {
-  const contentChildren = content.children;
-  filteredCookies = [];
-
-  for (let children of contentChildren) {
-    if (!children.textContent.includes(filterInput.value)) {
-      filteredCookies.push(children.textContent);
+function filterBtnListner() {
+  filterButton.addEventListener("click", () => {
+    const contentChildren = content.children;
+    filteredCookies = [];
+    for (let children of contentChildren) {
+      if (!children.textContent.includes(filterInput.value)) {
+        filteredCookies.push(children.textContent);
+      }
     }
-  }
+    content.innerHTML = "";
+    for (let i = 0; i < filteredCookies.length; i++) {
+      appContent += `<li>${filteredCookies[i]}</li>`;
+    }
+    content.innerHTML = appContent;
+    filterInput.value = "";
+  });
+}
 
+function cookieDictSelctor(type) {
+  if (type !== "all") {
+    const cookieDict = cookieTypeDict[type];
+    return cookieDict;
+  } else {
+    const cookieDict = [
+      ...assultCookies,
+      ...defensiveCookies,
+      ...magicianCookies
+    ];
+    return cookieDict;
+  }
+}
+
+function showCookieList(type) {
+  const cookieDict = cookieDictSelctor(type);
+  cookieRenderer(cookieDict);
+}
+
+function cookieRenderer(cookieDict) {
   content.innerHTML = "";
-  for (let i = 0; i < filteredCookies.length; i++) {
-    appContent += `<li>${filteredCookies[i]}</li>`;
+  for (let i = 0; i < cookieDict.length; i++) {
+    filteredCookies.push(cookies[i]);
+    appContent += `<li>${cookieDict[i]}</li>`;
   }
   content.innerHTML = appContent;
-  filterInput.value = "";
-});
+  appContent = "";
+}
+
+function cookieTypeListner() {
+  const cookieTypeBtn = document.querySelector("div#cookie-type-button");
+  cookieTypeBtn.addEventListener("click", (event) => {
+    const cookieType = event.target.id;
+    showCookieList(cookieType);
+  });
+}
+
+function main() {
+  cookieTypeListner();
+  filterBtnListner();
+}
+
+main();
