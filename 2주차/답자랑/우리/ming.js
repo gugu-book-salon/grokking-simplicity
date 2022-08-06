@@ -49,7 +49,7 @@ function main() {
   const cookieMap = [
     {
       type: "all",
-      value: []
+      value: [...defensiveCookies, ...magicianCookies, ...assultCookies]
     },
     {
       type: "defensive",
@@ -64,75 +64,60 @@ function main() {
       value: assultCookies
     }
   ];
-
-  getCookies(cookieMap);
-  removeCookie();
+  setFilteredCookieEvent(cookieMap);
+  setRemovedCookieEvent();
 }
 
-function getInnerText() {
+function setFilteredCookieEvent(cookieMap) {
+  cookieMap.forEach((item) => {
+    const btn = document.getElementById(item.type);
+    btn.addEventListener("click", () => getCookiesEvent(item.value));
+  });
+}
+function setRemovedCookieEvent() {
+  const removeBtn = document.getElementById("filter-button");
+  removeBtn.addEventListener("click", () => {
+    removeCookieEvent();
+  });
+}
+
+function getFilteredCookie() {
   const content = document.getElementById("content");
   const contentChildren = [...content.children];
   return contentChildren.reduce((acc, cur) => {
-    acc.push(cur);
+    acc.push(cur.innerHTML);
     return acc;
   }, []);
 }
 
-function getFilteredCookie(filteredCookie) {
-  const newArr = getInnerText();
-  return newArr.filter((item) => filteredCookie !== item);
+function removeCookie() {
+  const filteredCookie = document.getElementById("filter-input");
+  const newArr = getFilteredCookie();
+  return newArr.filter((item) => filteredCookie.value !== item);
 }
 
 function setInnerText(cookies) {
-  let newArr = [...cookies];
   const content = document.getElementById("content");
-  let appContent = "";
-
-  content.innerHTML = "";
-  for (let i = 0; i < cookies.length; i++) {
-    newArr.push(cookies[i]);
-    appContent += `<li>${cookies[i]}</li>`;
-  }
-  content.innerHTML = appContent;
-  appContent = "";
-  return newArr;
+  content.innerHTML = cookies.reduce((acc, cur) => {
+    acc = acc + `<li>${cur}</li>`;
+    return acc;
+  }, "");
 }
 
-function pushCookie(filteredCookies) {
+function setFilteredCookies(filteredCookies) {
   return filteredCookies.reduce((acc, cur) => {
     acc.push(cur);
     return acc;
   }, []);
 }
 
-function mergeCookie(cookieMap) {
-  let newArr = [];
-  cookieMap.forEach((element) => {
-    newArr = [...newArr, ...pushCookie(element.value)];
-  });
-  return newArr;
+function getCookiesEvent(value) {
+  const newArr = setFilteredCookies(value);
+  setInnerText(newArr);
 }
 
-function getCookies(cookieMap) {
-  cookieMap.forEach((element) => {
-    let newArr = [];
-    const button = document.getElementById(element.type);
-    button.addEventListener("click", () => {
-      newArr =
-        element.type === "all"
-          ? mergeCookie(cookieMap)
-          : pushCookie(element.value);
-      setInnerText(newArr);
-    });
-  });
-}
-
-function removeCookie() {
-  const filterInput = document.getElementById("filter-input");
-  const filterButton = document.getElementById("filter-button");
-  let filteredCookies = [];
-  filterButton.addEventListener("click", () => {
-    filteredCookies = getFilteredCookie(filterInput.value);
-    setInnerText(filteredCookies);
-  });
+function removeCookieEvent() {
+  let removedCookies = [];
+  removedCookies = removeCookie();
+  setInnerText(removedCookies);
 }
