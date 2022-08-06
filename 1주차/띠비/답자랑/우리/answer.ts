@@ -15,7 +15,6 @@ function add(a, b) {
 
 function setSumTailSpanInnerText(sum) {
   const sumTailSpan = document.getElementById("sum-tail");
-  console.log(sum);
   sumTailSpan.innerText = compareNum(sum, 100)
     ? `으로 $100를 넘습니다`
     : `으로 $100를 넘지 못합니다`;
