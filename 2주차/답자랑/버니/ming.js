@@ -1,7 +1,5 @@
 import "./styles.css";
 
-const cookies = [];
-
 const assultCookies = [
   "크런치초코칩 쿠키",
   "다크카카오 쿠키",
@@ -44,78 +42,78 @@ const magicianCookies = [
   "마법사맛 쿠키"
 ];
 
-const cookieTypeDict = {
-  assult: assultCookies,
-  defensive: defensiveCookies,
-  magician: magicianCookies
-};
+function setAppcontent(cookieList) {
+  let appContent = cookieList.reduce(
+    (acc, current) => acc + `<li>${current}</li>`,
+    ""
+  );
+  return appContent;
+}
+function cookieRemover(contentChildren, filterInput) {
+  let filteredCookies = [];
+  [...contentChildren].reduce((acc, current) => {
+    if (!current.textContent.includes(filterInput.value))
+      filteredCookies.push(current.textContent);
+  }, "");
+  return filteredCookies;
+}
 
-let filteredCookies = [];
+function removeCookie(content) {
+  const filterInput = document.getElementById("filter-input");
+  const contentChildren = content.children;
+  content.innerHTML = setAppcontent(
+    cookieRemover(contentChildren, filterInput)
+  );
+  filterInput.value = "";
+}
 
-const content = document.getElementById("content");
-const filterInput = document.getElementById("filter-input");
-const filterButton = document.getElementById("filter-button");
-
-let appContent = "";
-
-function filterBtnListner() {
+function filterBtnListner(content) {
+  const filterButton = document.getElementById("filter-button");
   filterButton.addEventListener("click", () => {
-    const contentChildren = content.children;
-    filteredCookies = [];
-    for (let children of contentChildren) {
-      if (!children.textContent.includes(filterInput.value)) {
-        filteredCookies.push(children.textContent);
-      }
-    }
-    content.innerHTML = "";
-    for (let i = 0; i < filteredCookies.length; i++) {
-      appContent += `<li>${filteredCookies[i]}</li>`;
-    }
-    content.innerHTML = appContent;
-    filterInput.value = "";
+    removeCookie(content);
   });
 }
 
-function cookieDictSelctor(type) {
-  if (type !== "all") {
-    const cookieDict = cookieTypeDict[type];
-    return cookieDict;
-  } else {
-    const cookieDict = [
+function cookieListSelctor(type) {
+  const cookieTypeDict = {
+    assult: assultCookies,
+    defensive: defensiveCookies,
+    magician: magicianCookies
+  };
+  if (type === "all") {
+    const cookieList = [
       ...assultCookies,
       ...defensiveCookies,
       ...magicianCookies
     ];
-    return cookieDict;
+    return cookieList;
+  } else {
+    const cookieList = cookieTypeDict[type];
+    return cookieList;
   }
 }
 
-function showCookieList(type) {
-  const cookieDict = cookieDictSelctor(type);
-  cookieRenderer(cookieDict);
+function showCookieList(type, content) {
+  const cookieList = cookieListSelctor(type);
+  cookieRenderer(cookieList, content);
 }
 
-function cookieRenderer(cookieDict) {
-  content.innerHTML = "";
-  for (let i = 0; i < cookieDict.length; i++) {
-    filteredCookies.push(cookies[i]);
-    appContent += `<li>${cookieDict[i]}</li>`;
-  }
-  content.innerHTML = appContent;
-  appContent = "";
+function cookieRenderer(cookieDict, content) {
+  content.innerHTML = setAppcontent(cookieDict);
 }
 
-function cookieTypeListner() {
+function cookieTypeListner(content) {
   const cookieTypeBtn = document.querySelector("div#cookie-type-button");
   cookieTypeBtn.addEventListener("click", (event) => {
     const cookieType = event.target.id;
-    showCookieList(cookieType);
+    showCookieList(cookieType, content);
   });
 }
 
 function main() {
-  cookieTypeListner();
-  filterBtnListner();
+  const content = document.getElementById("content");
+  cookieTypeListner(content);
+  filterBtnListner(content);
 }
 
 main();
