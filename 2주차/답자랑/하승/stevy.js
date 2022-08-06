@@ -15,16 +15,18 @@
 // 장바구니에는 상품명과 개수가 저장 되었지만 TODO LIST 에는 할일 이름과 마감 시간, 중요도 데이터가 들어가 있습니다
 // 장바구니에서 계층화 시킨 함수들을 이용해서 코드 수정을 최소화 하여 TODO LIST를 구현해주세요
 
-const submit = document.querySelector(".addItems-submit");
+function addItems() {
+  const submit = document.querySelector(".addItems-submit");
+  submit.addEventListener("click", addItem);
+}
 
-const clear = document.querySelector(".displayItems-clear");
+function clearItems() {
+  const clear = document.querySelector(".displayItems-clear");
+  clear.addEventListener("click", removeItems);
+}
 
-//Submit listener
-submit.addEventListener("click", addItem);
 //Check for local storage
 document.addEventListener("DOMContentLoaded", displayStorage);
-//Clear list
-clear.addEventListener("click", removeItems);
 
 function when(predicate, callback) {
   if (predicate) {
