@@ -20,10 +20,14 @@ function addItems() {
   submit.addEventListener("click", addItem);
 }
 
+addItems();
+
 function clearItems() {
   const clear = document.querySelector(".displayItems-clear");
   clear.addEventListener("click", removeItems);
 }
+
+clearItems();
 
 //Check for local storage
 document.addEventListener("DOMContentLoaded", displayStorage);
