@@ -1,147 +1,174 @@
 // 당신은 구구 마트에 입사한 신입 개발자입니다
 // 취업난 속에서도 취업을 하신 여러분 축하 드립니다
 
-// PR 1
 // 사장인 박훌린은 여러분에게 미션을 줍니다
 // 여러분들의 선배가 짜놓은 장바구니 추가 페이지에 수량을 같이 넣어서 저장시키고 싶다는 요구입니다
 // 신입 사원인 여러분은 함수형 코딩 책에서 배운 것을 바탕으로 리팩트링과 함께 수량 데이터를 추가해서 출력하는 기능 까지 구현하게 됩니다
-
-// PR2
-// 변덕스러운 사장 박훌린은 두번째 미션을 줍니다
-// 당장 오늘까지 사원들이 쓸 TODO LIST 를 구현해오라는 미션입니다
-// 신입 사원이 여러분들은 고민을 하겠지만 큰 문제가 없습니다 여러분들이 구현한 계층형 설계가 잘된 장바구니 페이지를 이용하면 되니까요!
-// 장바구니에는 상품명과 개수가 저장 되었지만 TODO LIST 에는 할일 이름과 마감 시간, 중요도 데이터가 들어가 있습니다
-// 장바구니에서 계층화 시킨 함수들을 이용해서 코드 수정을 최소화 하여 TODO LIST를 구현해주세요
-
-const addItemsAction = document.querySelector(".addItems-action");
-const input = document.querySelector(".addItems-input");
-const submit = document.querySelector(".addItems-submit");
-
-//Display items container
-const list = document.querySelector(".list");
-const displayItemsAction = document.querySelector(".displayItems-action");
-const clear = document.querySelector(".displayItems-clear");
-
-//Add event listeners
-//Submit listener
-submit.addEventListener("click", addItem);
-//Check for local storage
-document.addEventListener("DOMContentLoaded", displayStorage);
-//Clear list
-clear.addEventListener("click", removeItems);
-//Listen to list to delete individual items
-list.addEventListener("click", removeSingleItem);
-
-//functions
-function addItem(event) {
-  event.preventDefault();
-  let value = input.value;
-  if (value === "") {
-    showAction(addItemsAction, "Please add grocery item", false);
-  } else {
-    showAction(addItemsAction, `${value} added to the list`, true);
-    createItem(value);
-    updateStorage(value);
-  }
+main();
+function main() {
+  setEventListener();
 }
 
-function showAction(element, text, value) {
-  if (value === true) {
-    element.classList.add("success");
-    element.innerText = text;
-    input.value = "";
-    setTimeout(function () {
-      element.classList.remove("success");
-    }, 3000);
-  } else {
-    element.classList.add("alert");
-    element.innerText = text;
-    input.value = "";
-    setTimeout(function () {
-      element.classList.remove("alert");
-    }, 3000);
+function setEventListener() {
+  setSubmitEvent();
+  setClearEvent();
+  setRemoveSingleItem();
+  document.addEventListener("DOMContentLoaded", displayStorage);
+}
+function setSubmitEvent() {
+  const addItemsAction = document.querySelector(".addItems-action");
+  const addItems = document.querySelector(".addItems-input");
+  const itemCount = document.querySelector(".itemCount-input");
+  const list = document.querySelector(".list");
+  const submit = document.querySelector(".addItems-submit");
+  submit.addEventListener("click", function (event) {
+    addItem(event, addItemsAction, addItems, itemCount, list);
+  });
+}
+// event setting
+function setClearEvent() {
+  const displayItemsAction = document.querySelector(".displayItems-action");
+  const list = document.querySelector(".list");
+
+  const clear = document.querySelector(".displayItems-clear");
+
+  //Clear list
+  clear.addEventListener("click", () => {
+    removeItems(displayItemsAction, list);
+  });
+}
+function setRemoveSingleItem() {
+  const displayItemsAction = document.querySelector(".displayItems-action");
+  const list = document.querySelector(".list");
+
+  list.addEventListener("click", function (event) {
+    removeSingleItem(event, displayItemsAction, list);
+  });
+}
+
+// util function
+
+function isNotBrank(str) {
+  return str === "";
+}
+function isError(addItemsValue, itemCount) {
+  return !isNotBrank(addItemsValue) || isNaN(itemCount);
+}
+function resetInputValue(...element) {
+  element.forEach((item) => (item.value = ""));
+}
+function setInnerText(element, text) {
+  element.innerText = text;
+}
+function addClassList(element, className) {
+  element.classList.add(className);
+}
+function setInnerHTML(element, text) {
+  element.innerHTML = text;
+}
+function getLocalStorage(key) {
+  console.log(localStorage.getItem(key));
+  return localStorage.getItem(key);
+}
+function getJsonParseLocalStorage(key) {
+  return JSON.parse(getLocalStorage(key));
+}
+function compare(a, b) {
+  return a > b;
+}
+
+function addItem(event, addItemsAction, addItems, itemCount, list) {
+  event.preventDefault();
+  const addItemsValue = addItems.value;
+  const itemCountValue = itemCount.value;
+  if (!isError(addItemsValue, itemCountValue)) {
+    showAction(
+      addItemsAction,
+      "Please add grocery item and grocery count",
+      "alert"
+    );
+    resetInputValue(addItems, itemCount);
+    return;
   }
+  showAction(addItemsAction, `${addItemsValue} added to the list`, "success");
+  createItem(addItemsValue, itemCountValue, list);
+  updateStorage(addItemsValue);
+  resetInputValue(addItems, itemCount);
+}
+
+function showAction(element, text, className) {
+  addClassList(element, className);
+  setInnerText(element, text);
+  setTimeout(function () {
+    element.classList.remove(className);
+  }, 3000);
 }
 
 // create item
-function createItem(value) {
+function createItem(addItem, itemCnt, list) {
   let parent = document.createElement("div");
-  parent.classList.add("grocery-item");
-
-  // let title = document.createElement('h4');
-  //     title.classList.add('grocery-item__title');
-
-  parent.innerHTML = `<h4 class="grocery-item__title">${value}</h4>
-    <a href="#" class="grocery-item__link">
-        <i class="far fa-trash-alt"></i>
-    </a>`;
-
+  addClassList(parent, "grocery-item");
+  setInnerHTML(
+    parent,
+    `<h4 class="grocery-item__title">${addItem} ${itemCnt}개</h4>
+  <a href="#" class="grocery-item__link">
+      <i class="far fa-trash-alt"></i>
+  </a>`
+  );
   list.appendChild(parent);
 }
 
-//update storage
+// update storage
 function updateStorage(value) {
-  let groceryList;
-
-  groceryList = localStorage.getItem("groceryList")
-    ? JSON.parse(localStorage.getItem("groceryList"))
+  let groceryList = getLocalStorage("groceryList")
+    ? getJsonParseLocalStorage("groceryList")
     : [];
-
   groceryList.push(value);
   localStorage.setItem("groceryList", JSON.stringify(groceryList));
 }
 
 //display items in local storage
 function displayStorage() {
-  let exists = localStorage.getItem("groceryList");
+  if (!getLocalStorage("groceryList")) return;
 
-  if (exists) {
-    let storageItems = JSON.parse(localStorage.getItem("groceryList"));
-    storageItems.forEach(function (element) {
-      createItem(element);
-    });
-  }
+  const storageItems = getJsonParseLocalStorage("groceryList");
+  storageItems.forEach(function (element) {
+    createItem(element);
+  });
 }
 
 //remove all items
-function removeItems() {
+function removeItems(displayItemsAction, list) {
   //delete from local storage
   localStorage.removeItem("groceryList");
-  let items = document.querySelectorAll(".grocery-item");
-
-  if (items.length > 0) {
-    //remove each item from the list
-    showAction(displayItemsAction, "All items deleted", false);
-    items.forEach(function (element) {
-      list.removeChild(element);
-    });
-  } else {
-    showAction(displayItemsAction, "No more items to delete", false);
+  const items = document.querySelectorAll(".grocery-item");
+  if (!compare(items.length, 0)) {
+    showAction(displayItemsAction, "No more items to delete", "alert");
+    return;
   }
+
+  showAction(displayItemsAction, "All items deleted", "alert");
+  items.forEach(function (element) {
+    list.removeChild(element);
+  });
 }
 
-//remove single item
-
-function removeSingleItem(event) {
+function removeSingleItem(event, displayItemsAction, list) {
   event.preventDefault();
 
-  let link = event.target.parentElement;
-  if (link.classList.contains("grocery-item__link")) {
-    let text = link.previousElementSibling.innerHTML;
-    let groceryItem = event.target.parentElement.parentElement;
-    //remove from list
-
-    list.removeChild(groceryItem);
-    showAction(displayItemsAction, `${text} removed from the list`, true);
-
-    //remove from local storage
-    editStorage(text);
-  }
+  const link = event.target.parentElement;
+  if (!link.classList.contains("grocery-item__link")) return;
+  const text = link.previousElementSibling.innerHTML;
+  const groceryItem = event.target.parentElement.parentElement;
+  list.removeChild(groceryItem);
+  showAction(displayItemsAction, `${text} removed from the list`, "success");
+  editStorage(text);
+  
 }
 
 function editStorage(item) {
-  let groceryItems = JSON.parse(localStorage.getItem("groceryList"));
-  let index = groceryItems.indexOf(item);
+  const groceryItems = getJsonParseLocalStorage("groceryList");
+  const index = groceryItems.indexOf(item);
 
   groceryItems.splice(index, 1);
   //first delete existing list
