@@ -19,7 +19,6 @@ const submit = document.querySelector(".addItems-submit");
 
 const clear = document.querySelector(".displayItems-clear");
 
-//Add event listeners
 //Submit listener
 submit.addEventListener("click", addItem);
 //Check for local storage
