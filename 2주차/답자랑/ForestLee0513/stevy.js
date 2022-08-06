@@ -9,8 +9,8 @@
 // 신입 사원인 여러분은 함수형 코딩 책에서 배운 것을 바탕으로 리팩트링과 함께 수량 데이터를 추가해서 출력하는 기능 까지 구현하게 됩니다
 
 function editStorage(item) {
-  let groceryItems = JSON.parse(getStorageItmes("groceryList"));
-  let index = groceryItems.indexOf(item);
+  const groceryItems = JSON.parse(getStorageItmes("groceryList"));
+  const index = groceryItems.indexOf(item);
 
   groceryItems.splice(index, 1);
   //first delete existing list
@@ -169,7 +169,7 @@ function removeAllItems() {
 
   //delete from local storage
   removeStorageItems("groceryList");
-  let items = document.querySelectorAll(".grocery-item");
+  const items = document.querySelectorAll(".grocery-item");
 
   if (items.length > 0) {
     //remove each item from the list
@@ -187,10 +187,10 @@ function removeItem(event) {
   event.preventDefault();
   const list = document.querySelector(".list");
 
-  let link = event.target.parentElement;
+  const link = event.target.parentElement;
   if (link.classList.contains("grocery-item__link")) {
-    let text = link.previousElementSibling.innerHTML;
-    let groceryItem = event.target.parentElement.parentElement;
+    const text = link.previousElementSibling.innerHTML;
+    const groceryItem = event.target.parentElement.parentElement;
     //remove from list
 
     list.removeChild(groceryItem);
