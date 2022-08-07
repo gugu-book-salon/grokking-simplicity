@@ -119,10 +119,10 @@ function updateStorage(value) {
 
 //display items in local storage
 function displayStorage() {
-  let exists = localStorage.getItem("groceryList");
+  const exists = localStorage.getItem("groceryList");
 
   when(exists, function () {
-    let storageItems = JSON.parse(localStorage.getItem("groceryList"));
+    const storageItems = JSON.parse(localStorage.getItem("groceryList"));
     storageItems.forEach(function (element) {
       createItem(element);
     });
@@ -164,8 +164,8 @@ function removeSingleItem(event) {
   list.addEventListener("click", removeSingleItem);
 
   when(link.classList.contains("grocery-item__link"), function () {
-    let text = link.previousElementSibling.innerHTML;
-    let groceryItem = event.target.parentElement.parentElement;
+    const text = link.previousElementSibling.innerHTML;
+    const groceryItem = event.target.parentElement.parentElement;
     //remove from list
 
     list.removeChild(groceryItem);
@@ -177,8 +177,8 @@ function removeSingleItem(event) {
 }
 
 function editStorage(item) {
-  let groceryItems = JSON.parse(localStorage.getItem("groceryList"));
-  let index = groceryItems.indexOf(item);
+  const groceryItems = JSON.parse(localStorage.getItem("groceryList"));
+  const index = groceryItems.indexOf(item);
 
   groceryItems.splice(index, 1);
   //first delete existing list
