@@ -38,7 +38,7 @@ function when(predicate, callback) {
   }
 }
 
-function IF(predicate, then, ELSE) {
+function executionByCondition(predicate, then, ELSE) {
   if (predicate) {
     then();
   } else {
@@ -71,7 +71,7 @@ function addItem(event) {
   list.addEventListener("click", removeSingleItem);
   const value = input.value;
 
-  IF(
+  executionByCondition(
     value === "",
     () => {
       showAction(addItemsAction, "Please add grocery item", false);
@@ -139,7 +139,7 @@ function removeItems() {
   const displayItemsAction = document.querySelector(".displayItems-action");
   const list = document.querySelector(".list");
 
-  IF(
+  executionByCondition(
     items.length > 0,
     function () {
       showAction(displayItemsAction, "All items deleted", false);
