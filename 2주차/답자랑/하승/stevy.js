@@ -62,25 +62,27 @@ function createAndUpdateItem(item) {
   updateStorage(item);
 }
 
+function addRequestMessage() {
+  showAction(addItemsAction, "Please add grocery item", false);
+}
+
+function addedValueMessage(value) {
+  const addItemsAction = document.querySelector(".addItems-action");
+  showAction(addItemsAction, `${value} added to the list`, true);
+  createAndUpdateItem(value);
+}
+
 //functions
 function addItem(event) {
   event.preventDefault();
-  const addItemsAction = document.querySelector(".addItems-action");
   const input = document.querySelector(".addItems-input");
   const list = document.querySelector(".list");
   list.addEventListener("click", removeSingleItem);
   const value = input.value;
 
-  executionByCondition(
-    value === "",
-    () => {
-      showAction(addItemsAction, "Please add grocery item", false);
-    },
-    () => {
-      showAction(addItemsAction, `${value} added to the list`, true);
-      createAndUpdate(value);
-    }
-  );
+  executionByCondition(value === "", addRequestMessage, () => {
+    addedValueMessage(value);
+  });
 }
 
 function showAction(element, text, value) {
