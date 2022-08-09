@@ -32,7 +32,6 @@ function when(predicate, callback) {
   }
 }
 function displayCookie(content, cookiesName) {
-
   const cookieLists = cookiesName.map(function (cookie) {
     return `<li>${cookie}</li>`;
   });
@@ -127,7 +126,7 @@ function addButtonClickedEventListener(button, eventName, callback) {
 }
 
 function addClickedButton() {
-  const content = document.getElementById("content"); //쿠키를 보여줄 영역
+  const content = document.getElementById("content");
   const cookieList = document.getElementById("cookie-list");
   const filterButton = document.getElementById("filter-button");
   // let appContent = "";
