@@ -5,36 +5,25 @@
 // 여러분들의 선배가 짜놓은 장바구니 추가 페이지에 수량을 같이 넣어서 저장시키고 싶다는 요구입니다
 // 신입 사원인 여러분은 함수형 코딩 책에서 배운 것을 바탕으로 리팩트링과 함께 수량 데이터를 추가해서 출력하는 기능 까지 구현하게 됩니다
 
-// const addItemsAction = document.querySelector(".addItems-action");
-// const input = document.querySelector(".addItems-input");
-// const submit = document.querySelector(".addItems-submit");
-
-//Display items container
-// const list = document.querySelector(".list");
-// const displayItemsAction = document.querySelector(".displayItems-action");
-// const clear = document.querySelector(".displayItems-clear");
-
-//Add event listeners
-function setEventListnets() {
+function setEventListner() {
+  //submit button
   const submit = document.querySelector(".addItems-submit");
-  const list = document.querySelector(".list");
-  const displayItemsAction = document.querySelector(".displayItems-action");
-  const clear = document.querySelector(".displayItems-clear");
   submit.addEventListener("click", addItem);
-  //Check for local storage
-  document.addEventListener("DOMContentLoaded", displayStorage);
-  //Clear list
+  //remove button
+  const clear = document.querySelector(".displayItems-clear");
   clear.addEventListener("click", removeItems);
-  //Listen to list to delete individual items
+  //list
+  const list = document.querySelector(".list");
   list.addEventListener("click", removeSingleItem);
+  //display st
+  document.addEventListener("DOMContentLoaded", displayStorage);
 }
-//Submit listener
-
 //functions
 function addItem(event) {
-  event.preventDefault();
   const input = document.querySelector(".addItems-input");
-  const value = input.value;
+  const addItemsAction = document.querySelector(".addItems-action");
+  event.preventDefault();
+  let value = input.value;
   if (value === "") {
     showAction(addItemsAction, "Please add grocery item", false);
   } else {
@@ -95,10 +84,10 @@ function displayStorage() {
 //remove all items
 function removeItems() {
   //delete from local storage
+  const displayItemsAction = document.querySelector(".displayItems-action");
   const list = document.querySelector(".list");
   localStorage.removeItem("groceryList");
   const items = document.querySelectorAll(".grocery-item");
-
   if (items.length > 0) {
     //remove each item from the list
     showAction(displayItemsAction, "All items deleted", false);
@@ -113,6 +102,7 @@ function removeItems() {
 //remove single item
 
 function removeSingleItem(event) {
+  const displayItemsAction = document.querySelector(".displayItems-action");
   const list = document.querySelector(".list");
   event.preventDefault();
   const link = event.target.parentElement;
@@ -139,5 +129,7 @@ function editStorage(item) {
 }
 
 function main() {
-  setEventListnets();
+  setEventListner();
 }
+
+main();
