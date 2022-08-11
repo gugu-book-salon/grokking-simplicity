@@ -80,13 +80,12 @@ function renderCookieListByMenu(target, content) {
 }
 
 function filteredCookieArray(contentChildren, filterInput) {
-  let filteredCookies = [];
-  [...contentChildren].forEach((cookie) => {
-    if (!cookie.textContent.includes(filterInput.value)) {
-      filteredCookies.push(cookie.textContent);
-    }
-  });
-  return filteredCookies;
+  let cookiesList = [];
+  const filteredCookies = [...contentChildren].filter(
+    (cookie) => !cookie.textContent.includes(filterInput.value)
+  );
+  filteredCookies.forEach((cookie) => cookiesList.push(cookie.innerText));
+  return cookiesList;
 }
 
 function removeSpecifiedCookieName(content) {
