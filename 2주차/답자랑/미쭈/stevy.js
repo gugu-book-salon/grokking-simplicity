@@ -1,153 +1,211 @@
-// https://codesandbox.io/s/dazzling-mcnulty-h5o9dk?file=/src/index.js:0-4305
+main();
 
-// 당신은 구구 마트에 입사한 신입 개발자입니다
-// 취업난 속에서도 취업을 하신 여러분 축하 드립니다
-
-// PR 1
-// 사장인 박훌린은 여러분에게 미션을 줍니다
-// 여러분들의 선배가 짜놓은 장바구니 추가 페이지에 수량을 같이 넣어서 저장시키고 싶다는 요구입니다
-// 신입 사원인 여러분은 함수형 코딩 책에서 배운 것을 바탕으로 리팩트링과 함께 수량 데이터를 추가해서 출력하는 기능 까지 구현하게 됩니다
-
-// PR2
-// 변덕스러운 사장 박훌린은 두번째 미션을 줍니다
-// 당장 오늘까지 사원들이 쓸 TODO LIST 를 구현해오라는 미션입니다
-// 신입 사원이 여러분들은 고민을 하겠지만 큰 문제가 없습니다 여러분들이 구현한 계층형 설계가 잘된 장바구니 페이지를 이용하면 되니까요!
-// 장바구니에는 상품명과 개수가 저장 되었지만 TODO LIST 에는 할일 이름과 마감 시간, 중요도 데이터가 들어가 있습니다
-// 장바구니에서 계층화 시킨 함수들을 이용해서 코드 수정을 최소화 하여 TODO LIST를 구현해주세요
-
-const addItemsAction = document.querySelector(".addItems-action");
-const input = document.querySelector(".addItems-input");
-const submit = document.querySelector(".addItems-submit");
-
-//Display items container
-const list = document.querySelector(".list");
-const displayItemsAction = document.querySelector(".displayItems-action");
-const clear = document.querySelector(".displayItems-clear");
-
-//Add event listeners
-//Submit listener
-submit.addEventListener("click", addItem);
-//Check for local storage
-document.addEventListener("DOMContentLoaded", displayStorage);
-//Clear list
-clear.addEventListener("click", removeItems);
-//Listen to list to delete individual items
-list.addEventListener("click", removeSingleItem);
-
-//functions
-function addItem(event) {
-    event.preventDefault();
-    let value = input.value;
-    if (value === "") {
-        showAction(addItemsAction, "Please add grocery item", false);
-    } else {
-        showAction(addItemsAction, `${value} added to the list`, true);
-        createItem(value);
-        updateStorage(value);
-    }
+function isEqual(a, b) {
+  return a === b;
 }
 
-function showAction(element, text, value) {
-    if (value === true) {
-        element.classList.add("success");
-        element.innerText = text;
-        input.value = "";
-        setTimeout(function () {
-            element.classList.remove("success");
-        }, 3000);
-    } else {
-        element.classList.add("alert");
-        element.innerText = text;
-        input.value = "";
-        setTimeout(function () {
-            element.classList.remove("alert");
-        }, 3000);
-    }
+function isCBiggerThanD(c, d) {
+  return c > d;
 }
 
-// create item
-function createItem(value) {
-    let parent = document.createElement("div");
-    parent.classList.add("grocery-item");
-
-    // let title = document.createElement('h4');
-    //     title.classList.add('grocery-item__title');
-
-    parent.innerHTML = `<h4 class="grocery-item__title">${value}</h4>
-    <a href="#" class="grocery-item__link">
-        <i class="far fa-trash-alt"></i>
-    </a>`;
-
-    list.appendChild(parent);
+function setDom(className) {
+  return document.createElement(className);
 }
 
-//update storage
+function getDom(className) {
+  return document.querySelector(className);
+}
+
+function getDomAll(className) {
+  return document.querySelectorAll(className);
+}
+
+function addClassList(element, ...className) {
+  element.classList.add(...className);
+}
+
+function addInnerText(element, text) {
+  element.innerText = text;
+}
+
+function addInnerHTML(element, html) {
+  element.innerHTML = html;
+}
+
+function resetInnerValue(element) {
+  element.value = '';
+}
+
+function removeClassName(element, className, time) {
+  setTimeout(() => {
+    element.classList.remove(className);
+  }, time);
+}
+
+function setLocalSt(key, value) {
+  return localStorage.setItem(key, JSON.stringify(value));
+}
+
+function getLocalSt(key) {
+  return JSON.parse(localStorage.getItem(key));
+}
+
+function removeLocalSt(key) {
+  return localStorage.removeItem(key);
+}
+
+function actionType(element, text, type, time) {
+  addClassList(element, type);
+  addInnerText(element, text);
+  removeClassName(element, type, time);
+}
+
+function showAction(element, text, boolean) {
+  if (boolean) {
+    actionType(element, text, 'success', 3000);
+  }
+  if (!boolean) {
+    actionType(element, text, 'alert', 3000);
+  }
+}
+
+function groceryItemTemplate(quantity, item) {
+  return `<span class="grocery-item__count">${quantity}</span>
+  <h4 class="grocery-item__title">${item}</h4>
+  <a href="#" class="grocery-item__link">
+      <i class="far fa-trash-alt"></i>
+  </a>`;
+}
+
+function createItem(value, list) {
+  const parent = setDom('div');
+  const item = getLocalSt(value).value;
+  const quantity = getLocalSt(value).quantity;
+  addClassList(parent, 'grocery-item', `${value}`);
+  addInnerHTML(parent, groceryItemTemplate(quantity, item));
+  list.appendChild(parent);
+}
+
+function updateDom(value, list) {
+  const groceryItemDom = getDom(`.grocery-item.${value}`);
+  if (groceryItemDom) {
+    list.removeChild(groceryItemDom);
+    createItem(value, list);
+  }
+  if (!groceryItemDom) {
+    createItem(value, list);
+  }
+}
+
+function groceryNamesArr() {
+  return getLocalSt('groceryName') ? getLocalSt('groceryName') : [];
+}
+
 function updateStorage(value) {
-    let groceryList;
-
-    groceryList = localStorage.getItem("groceryList")
-        ? JSON.parse(localStorage.getItem("groceryList"))
-        : [];
-
-    groceryList.push(value);
-    localStorage.setItem("groceryList", JSON.stringify(groceryList));
+  let quantity = 1;
+  let groceryNames = groceryNamesArr();
+  if (getLocalSt(value)) {
+    quantity = getLocalSt(value).quantity += 1;
+    setLocalSt(value, { value, quantity });
+  }
+  if (!getLocalSt(value)) {
+    setLocalSt(value, { value, quantity });
+    groceryNames.push(value);
+  }
+  setLocalSt('groceryName', groceryNames);
 }
 
-//display items in local storage
-function displayStorage() {
-    let exists = localStorage.getItem("groceryList");
+function addItem(list) {
+  const addItemsAction = getDom('.addItems-action');
+  const input = getDom('.addItems-input');
+  const value = input.value;
+  if (!isEqual(value, '')) {
+    showAction(addItemsAction, `${value} added to the list`, true);
+    updateStorage(value);
+    updateDom(value, list);
+    resetInnerValue(input);
+  }
+  if (isEqual(value, '')) {
+    showAction(addItemsAction, 'Please add grocery item', false);
+  }
+}
 
-    if (exists) {
-        let storageItems = JSON.parse(localStorage.getItem("groceryList"));
-        storageItems.forEach(function (element) {
-            createItem(element);
-        });
+function displayStorage(list) {
+  let groceryNames = groceryNamesArr();
+  const groceryItems = groceryNames.map((item) => getLocalSt(item));
+  groceryItems.forEach((data) => {
+    const value = data.value;
+    const quantity = data.quantity;
+    const parent = setDom('div');
+    addClassList(parent, 'grocery-item', `${value}`);
+    addInnerHTML(parent, groceryItemTemplate(quantity, value));
+    list.appendChild(parent);
+  });
+}
+
+function removeItems(list, displayItemsAct) {
+  const items = getDomAll('.grocery-item');
+  if (isCBiggerThanD(items.length, 0)) {
+    showAction(displayItemsAct, 'All items deleted', false);
+    items.forEach((item) => {
+      list.removeChild(item);
+    });
+  }
+  if (isEqual(items.length, 0)) {
+    showAction(displayItemsAct, 'No more items to delete', false);
+  }
+}
+
+function removeSingleItem(link, list, displayItemsAct) {
+  if (link.classList.contains('grocery-item__link')) {
+    const text = link.previousElementSibling.innerHTML;
+    const groceryItem = link.parentElement;
+    let groceryNames = groceryNamesArr();
+    removeLocalSt(text);
+    if (isCBiggerThanD(groceryNames.length, 0)) {
+      const filteredName = groceryNames.filter((item) => item !== text);
+      setLocalSt('groceryName', filteredName);
     }
+    list.removeChild(groceryItem);
+    showAction(displayItemsAct, `${text} removed from the list`, true);
+  }
 }
 
-//remove all items
-function removeItems() {
-    //delete from local storage
-    localStorage.removeItem("groceryList");
-    let items = document.querySelectorAll(".grocery-item");
-
-    if (items.length > 0) {
-        //remove each item from the list
-        showAction(displayItemsAction, "All items deleted", false);
-        items.forEach(function (element) {
-            list.removeChild(element);
-        });
-    } else {
-        showAction(displayItemsAction, "No more items to delete", false);
-    }
-}
-
-//remove single item
-
-function removeSingleItem(event) {
+function clickSubmitItem(list) {
+  const submit = getDom('.addItems-submit');
+  submit.addEventListener('click', (event) => {
     event.preventDefault();
-
-    let link = event.target.parentElement;
-    if (link.classList.contains("grocery-item__link")) {
-        let text = link.previousElementSibling.innerHTML;
-        let groceryItem = event.target.parentElement.parentElement;
-        //remove from list
-
-        list.removeChild(groceryItem);
-        showAction(displayItemsAction, `${text} removed from the list`, true);
-
-        //remove from local storage
-        editStorage(text);
-    }
+    addItem(list);
+  });
 }
 
-function editStorage(item) {
-    let groceryItems = JSON.parse(localStorage.getItem("groceryList"));
-    let index = groceryItems.indexOf(item);
+function clickRemoveAll(list, displayItemsAct) {
+  const displayItemsClear = getDom('.displayItems-clear');
+  displayItemsClear.addEventListener('click', () => {
+    const groceryNames = groceryNamesArr();
+    groceryNames.forEach((item) => removeLocalSt(item));
+    removeLocalSt('groceryName');
+    removeItems(list, displayItemsAct);
+  });
+}
 
-    groceryItems.splice(index, 1);
-    //first delete existing list
-    localStorage.removeItem("groceryList");
-    //add new updated/edited list
-    localStorage.setItem("groceryList", JSON.stringify(groceryItems));
+function clickRemoveSingle(list, displayItemsAct) {
+  list.addEventListener('click', (event) => {
+    event.preventDefault();
+    const link = event.target.parentElement;
+    removeSingleItem(link, list, displayItemsAct);
+  });
+}
+
+function addClickEvent(list) {
+  const displayItemsAct = getDom('.displayItems-action');
+  clickSubmitItem(list);
+  clickRemoveAll(list, displayItemsAct);
+  clickRemoveSingle(list, displayItemsAct);
+}
+
+function main() {
+  const list = getDom('.list');
+  document.addEventListener('DOMContentLoaded', displayStorage(list));
+  addClickEvent(list);
 }
