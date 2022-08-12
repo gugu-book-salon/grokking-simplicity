@@ -83,19 +83,10 @@ function displayCookieListByFilter(event, content) {
 
   const cookiesType = event.target.id;
 
-  const allCookies = mergeCookie([
-    ...assultCookies,
-    ...defensiveCookies,
-    ...magicianCookies,
-  ]);
+  const allCookies = mergeCookie([...assultCookies, ...defensiveCookies, ...magicianCookies]);
 
   const cookieTab = ["all", "assult", "defensive", "magician"];
-  const cookieFilter = [
-    allCookies,
-    assultCookies,
-    defensiveCookies,
-    magicianCookies,
-  ];
+  const cookieFilter = [allCookies, assultCookies, defensiveCookies, magicianCookies];
 
   cookieTab.forEach(function (cookie) {
     when(compare(cookiesType, cookie), function () {
@@ -108,17 +99,15 @@ function deleteCookie(content) {
   const filteredCookies = [];
   const filterInput = document.getElementById("filter-input");
   const contentChildren = content.children;
-  const childrenTextContent = children.textContent;
 
-  contentChildren.forEach(function (children) {
-    when(!childrenTextContent.includes(filterInput.value), function () {
+  Array.from(contentChildren).forEach(function (children) {
+    when(!children.textContent.includes(filterInput.value), function () {
       filteredCookies.push(children.textContent);
     });
   });
 
   //displayCookie 함수는 이제 2개의 인자를 받음
   displayCookie(content, filteredCookies);
-  // filterInput.value = "";
 }
 
 function addButtonClickedEventListener(button, eventName, callback) {
