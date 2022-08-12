@@ -2,24 +2,12 @@
 
 import "./styles.css";
 
-function withArrayCopy(array, modify) {
-  let copy = [...array];
-  modify(copy);
-  return copy;
-}
-
-function push(array, element) {
-  return withArrayCopy(array, function (copy) {
-    copy.push(element);
-  });
-}
-
 function mergeCookie(cookiesName) {
   const cookies = [];
-
   cookiesName.forEach(function (cookie) {
-    push(cookies, cookie);
+    cookies.push(cookie);
   });
+  return cookies;
 }
 
 function compare(a, b) {
