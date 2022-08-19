@@ -4,8 +4,8 @@ function isEqual(a, b) {
   return a === b;
 }
 
-function isCBiggerThanD(c, d) {
-  return c > d;
+function isQuantityLarger(a, b) {
+  return a > b;
 }
 
 function setDom(className) {
@@ -60,11 +60,11 @@ function actionType(element, text, type, time) {
   removeClassName(element, type, time);
 }
 
-function showAction(element, text, boolean) {
-  if (boolean) {
+function showAction(element, text, isSuccess) {
+  if (isSuccess) {
     actionType(element, text, 'success', 3000);
   }
-  if (!boolean) {
+  if (!isSuccess) {
     actionType(element, text, 'alert', 3000);
   }
 }
@@ -98,7 +98,7 @@ function updateDom(value, list) {
 }
 
 function groceryNamesArr() {
-  return getLocalSt('groceryName') ? getLocalSt('groceryName') : [];
+  return getLocalSt('groceryName') ?? [];
 }
 
 function updateStorage(value) {
@@ -131,9 +131,8 @@ function addItem(list) {
 }
 
 function displayStorage(list) {
-  let groceryNames = groceryNamesArr();
-  const groceryItems = groceryNames.map((item) => getLocalSt(item));
-  groceryItems.forEach((data) => {
+  const groceryNames = groceryNamesArr().map((item) => getLocalSt(item));
+  groceryNames.forEach((data) => {
     const value = data.value;
     const quantity = data.quantity;
     const parent = setDom('div');
@@ -145,7 +144,7 @@ function displayStorage(list) {
 
 function removeItems(list, displayItemsAct) {
   const items = getDomAll('.grocery-item');
-  if (isCBiggerThanD(items.length, 0)) {
+  if (isQuantityLarger(items.length, 0)) {
     showAction(displayItemsAct, 'All items deleted', false);
     items.forEach((item) => {
       list.removeChild(item);
@@ -162,7 +161,7 @@ function removeSingleItem(link, list, displayItemsAct) {
     const groceryItem = link.parentElement;
     let groceryNames = groceryNamesArr();
     removeLocalSt(text);
-    if (isCBiggerThanD(groceryNames.length, 0)) {
+    if (isQuantityLarger(groceryNames.length, 0)) {
       const filteredName = groceryNames.filter((item) => item !== text);
       setLocalSt('groceryName', filteredName);
     }
