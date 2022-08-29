@@ -1,5 +1,3 @@
-// https://codesandbox.io/s/dazzling-mcnulty-h5o9dk?file=/src/index.js:0-4305
-
 // 당신은 구구 마트에 입사한 신입 개발자입니다
 // 취업난 속에서도 취업을 하신 여러분 축하 드립니다
 

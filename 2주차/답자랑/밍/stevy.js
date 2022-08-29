@@ -13,139 +13,235 @@
 // 장바구니에는 상품명과 개수가 저장 되었지만 TODO LIST 에는 할일 이름과 마감 시간, 중요도 데이터가 들어가 있습니다
 // 장바구니에서 계층화 시킨 함수들을 이용해서 코드 수정을 최소화 하여 TODO LIST를 구현해주세요
 
-const addItemsAction = document.querySelector(".addItems-action");
-const input = document.querySelector(".addItems-input");
-const submit = document.querySelector(".addItems-submit");
+// ************************** //
+// ********* INPUT ********* //
+// ************************ //
+function getInputValue() {
+  const input = document.querySelector('.addItems-input');
+  return input.value;
+}
 
-//Display items container
-const list = document.querySelector(".list");
-const displayItemsAction = document.querySelector(".displayItems-action");
-const clear = document.querySelector(".displayItems-clear");
+function resetInputValue() {
+  const input = document.querySelector('.addItems-input');
+  input.value = '';
+}
 
-//Add event listeners
-//Submit listener
-submit.addEventListener("click", addItem);
-//Check for local storage
-document.addEventListener("DOMContentLoaded", displayStorage);
-//Clear list
-clear.addEventListener("click", removeItems);
-//Listen to list to delete individual items
-list.addEventListener("click", removeSingleItem);
+// ****************************************** //
+// ********* DOM HANDLER AND UTILS ********* //
+// **************************************** //
+function setInnerText(element, text) {
+  element.innerText = text;
+  return element;
+}
 
-//functions
-function addItem(event) {
-  event.preventDefault();
-  let value = input.value;
-  if (value === "") {
-    showAction(addItemsAction, "Please add grocery item", false);
-  } else {
-    showAction(addItemsAction, `${value} added to the list`, true);
-    createItem(value);
-    updateStorage(value);
+function addClass(element, className) {
+  element.classList.add(className);
+  return element;
+}
+
+function removeClass(element, className) {
+  element.classList.remove(className);
+  return element;
+}
+
+function manageClass(className) {
+  return function (element) {
+    return {
+      addClassName: () => addClass(element, className),
+      removeClassName: () => removeClass(element, className)
+    };
+  };
+}
+
+function isClassContains(element, findClass) {
+  return element.classList.contains(findClass);
+}
+
+function getSuccessOrAlertClassManager(isSuccess, element) {
+  const manageSuccessClass = manageClass('success');
+  const manageAlertClass = manageClass('alert');
+  return (isSuccess ? manageSuccessClass : manageAlertClass)(element);
+}
+
+function setItemCount(count) {
+  setInnerText(
+    document.querySelector('.displayItems-count'),
+    `(${count})`
+  );
+}
+
+
+function addItemElement(list, value) {
+  value !== '' && list.appendChild(createItemElement(value));
+}
+
+function createItemElement(value) {
+  const element = addClass(document.createElement('div'), 'grocery-item');
+  element.innerHTML = `
+    <h4 class='grocery-item__title'>${value}</h4>
+    <a href='#' class='grocery-item__link'>
+      <i class='far fa-trash-alt'></i>
+    </a>
+  `;
+  return element;
+}
+
+function removeItems(listElement) {
+  const groceryListLoacalStorageManager = manageLocalStorage('groceryList');
+  const groceryListItemElements = document.querySelectorAll('.grocery-item');
+
+  setRemoveShowAction(groceryListItemElements.length);
+  groceryListLoacalStorageManager.clear();
+  groceryListItemElements.forEach((groceryListItemElement) => listElement.removeChild(groceryListItemElement));
+
+  return 0;
+}
+
+function findListItemElement(element) {
+  let findElement = element;
+  while (!isClassContains(findElement, 'grocery-item')) {
+    findElement = element.parentElement;
+  }
+  return findElement;
+}
+
+// ********************************** //
+// ********* EVENT HANDLER ********* //
+// ******************************** //
+function submitButtonClickHandler(listElement) {
+  return function (event) {
+    event.preventDefault();
+    const inputValue = getInputValue();
+
+    addItemElement(listElement, inputValue);
+    setCreateShowAction(inputValue);
+
+    const itemList = updateStorage(inputValue);
+    setItemCount(itemList.length);
+  };
+}
+
+function loadEventHandler(listElement) {
+  return function() {
+    const itemList = displayStorage(listElement);
+    setItemCount(itemList.length);
+  };
+}
+
+function clearButtonClickHandler(listElement) {
+  return function () {
+    const itemListCount = removeItems(listElement);
+    setItemCount(itemListCount);
+  };
+}
+
+function listItemClickHandler(listElement) {
+  return function (event) {
+    event.preventDefault();
+    const element = findListItemElement(event.target);
+    const groceryListLoacalStorageManager = manageLocalStorage('groceryList');
+    const currentLocalStorageItems = JSON.parse(groceryListLoacalStorageManager.get('[]'));
+    const text = element.textContent.trim();
+    const newItems = currentLocalStorageItems.filter((item) => item !== text);
+
+    listElement.removeChild(element);
+    setRemoveShowAction(text, true);
+    setItemCount(newItems.length);
+
+    groceryListLoacalStorageManager.set(JSON.stringify(newItems));
   }
 }
 
-function showAction(element, text, value) {
-  if (value === true) {
-    element.classList.add("success");
-    element.innerText = text;
-    input.value = "";
-    setTimeout(function () {
-      element.classList.remove("success");
-    }, 3000);
-  } else {
-    element.classList.add("alert");
-    element.innerText = text;
-    input.value = "";
-    setTimeout(function () {
-      element.classList.remove("alert");
-    }, 3000);
+// ********************************* //
+// ********* ACTION LOGIC ********* //
+// ******************************* //
+function showAction(element, text, isSuccess) {
+  const { addClassName, removeClassName } = getSuccessOrAlertClassManager(isSuccess, element);
+
+  addClassName();
+  setTimeout(removeClassName, 3000);
+  setInnerText(element, text);
+  resetInputValue();
+}
+
+/**
+ * @param {(value: any) => boolean} predicate
+ * @param {{ onSuccess: string, onFail: string }} messages 성공 실패 메세지
+ * @returns [string, boolean] -> [show action 텍스트, 성공 실패 여부]
+ */
+function getShowActionParameters(predicate, messages) {
+  return predicate()
+    ? [messages.onFail, false]
+    : [messages.onSuccess, true];
+}
+
+function setCreateShowAction(value) {
+  const addItemsActionElement = document.querySelector('.addItems-action');
+  const messages = { onSuccess: `${value} added to the list`, onFail: 'Please add grocery item'};
+  const params = getShowActionParameters(() => value === '', messages);
+
+  showAction(...[addItemsActionElement, ...params]);
+}
+
+function setRemoveShowAction(value, isSingle) {
+  const displayItemsActionElement = document.querySelector('.displayItems-action');
+
+  if (isSingle) {
+    showAction(displayItemsActionElement, `${value} removed from the list`, true);
+    return;
   }
+
+  const messages = { onSuccess: 'All items deleted', onFail: 'No more items to delete' };
+  const params = getShowActionParameters(() => value <= 0, messages);
+
+  showAction(...[displayItemsActionElement, ...params]);
 }
 
-// create item
-function createItem(value) {
-  let parent = document.createElement("div");
-  parent.classList.add("grocery-item");
-
-  // let title = document.createElement('h4');
-  //     title.classList.add('grocery-item__title');
-
-  parent.innerHTML = `<h4 class="grocery-item__title">${value}</h4>
-    <a href="#" class="grocery-item__link">
-        <i class="far fa-trash-alt"></i>
-    </a>`;
-
-  list.appendChild(parent);
+// ********************************** //
+// ********* LOCAL STORAGE ********* //
+// ******************************** //
+function manageLocalStorage(key) {
+  return {
+    set: (value) => {
+      localStorage.setItem(key, value);
+    },
+    get: (defaultValue) => {
+      const value = localStorage.getItem(key);
+      return value ? value : defaultValue;
+    },
+    clear: () => {
+      localStorage.removeItem(key);
+    },
+  };
 }
 
-//update storage
 function updateStorage(value) {
-  let groceryList;
-
-  groceryList = localStorage.getItem("groceryList")
-    ? JSON.parse(localStorage.getItem("groceryList"))
-    : [];
-
+  const groceryListLoacalStorageManager = manageLocalStorage('groceryList');
+  const groceryList = JSON.parse(groceryListLoacalStorageManager.get('[]'));
   groceryList.push(value);
-  localStorage.setItem("groceryList", JSON.stringify(groceryList));
+  groceryListLoacalStorageManager.set(JSON.stringify(groceryList));
+  return groceryList;
 }
 
-//display items in local storage
-function displayStorage() {
-  let exists = localStorage.getItem("groceryList");
-
-  if (exists) {
-    let storageItems = JSON.parse(localStorage.getItem("groceryList"));
-    storageItems.forEach(function (element) {
-      createItem(element);
-    });
-  }
+function displayStorage(listElement) {
+  const storageItems = JSON.parse(manageLocalStorage('groceryList').get('[]'));
+  storageItems
+    .forEach((storageItem) => addItemElement(listElement, storageItem));
+  return storageItems;
 }
 
-//remove all items
-function removeItems() {
-  //delete from local storage
-  localStorage.removeItem("groceryList");
-  let items = document.querySelectorAll(".grocery-item");
+// ************************** //
+// ********** MAIN ********* //
+// ************************ //
+function init() {
+  const submit = document.querySelector('.addItems-submit');
+  const list = document.querySelector('.list');
+  const clear = document.querySelector('.displayItems-clear');
 
-  if (items.length > 0) {
-    //remove each item from the list
-    showAction(displayItemsAction, "All items deleted", false);
-    items.forEach(function (element) {
-      list.removeChild(element);
-    });
-  } else {
-    showAction(displayItemsAction, "No more items to delete", false);
-  }
+  submit.addEventListener('click', submitButtonClickHandler(list));
+  document.addEventListener('DOMContentLoaded', loadEventHandler(list));
+  clear.addEventListener('click', clearButtonClickHandler(list));
+  list.addEventListener('click', listItemClickHandler(list));
 }
 
-//remove single item
-
-function removeSingleItem(event) {
-  event.preventDefault();
-
-  let link = event.target.parentElement;
-  if (link.classList.contains("grocery-item__link")) {
-    let text = link.previousElementSibling.innerHTML;
-    let groceryItem = event.target.parentElement.parentElement;
-    //remove from list
-
-    list.removeChild(groceryItem);
-    showAction(displayItemsAction, `${text} removed from the list`, true);
-
-    //remove from local storage
-    editStorage(text);
-  }
-}
-
-function editStorage(item) {
-  let groceryItems = JSON.parse(localStorage.getItem("groceryList"));
-  let index = groceryItems.indexOf(item);
-
-  groceryItems.splice(index, 1);
-  //first delete existing list
-  localStorage.removeItem("groceryList");
-  //add new updated/edited list
-  localStorage.setItem("groceryList", JSON.stringify(groceryItems));
-}
+init();
